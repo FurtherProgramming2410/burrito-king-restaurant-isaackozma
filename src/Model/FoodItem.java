@@ -1,8 +1,12 @@
-
 //this class is for all the food items within the restaurant.
 //used for pricing, quantities and the naming
 //implements the kingitem interface. 
 //stores the name/price/quantity of the food item
+package Model;
+
+
+import Interface.KingItem;
+
 public class FoodItem implements KingItem{
 	 private String name;
 	 private double price;

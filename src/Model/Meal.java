@@ -2,6 +2,10 @@
 //the class implements the kingitem interface as was a requirement.
 //made it final as it should not be changed as stated in the requirements.
 //
+package Model;
+
+import Interface.KingItem;
+
 public class Meal implements KingItem {
 	 private static final double DISCOUNT = 3.0;
 	    private double price;

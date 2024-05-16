@@ -1,6 +1,9 @@
+package Model;
 import java.util.ArrayList;
 
 import java.util.List;
+
+import Interface.KingItem;
 
 
 //in this class is where the order process is
