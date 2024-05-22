@@ -29,12 +29,17 @@ public class FoodItem implements KingItem{
 	        this.quantity += quantity;
 	    }
 	    
+	    //getter method for name
 	    public String getName() {
 	        return name;
 	    }
+	    
+	    //getter method for price
 	    public double getPrice() {
 	        return price;
 	    }
+	    
+	    //getter method for quantity
 	    public int getQuantity() {
 	        return quantity;
 	    }

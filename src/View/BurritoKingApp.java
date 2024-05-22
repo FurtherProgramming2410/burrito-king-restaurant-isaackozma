@@ -1,5 +1,6 @@
 package View;
 import Model.User;
+import View.OrderOnDashBoard;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,6 +52,21 @@ public class BurritoKingApp extends Application{
 		Scene scene = new Scene(Dashboard.createDashboard(user), 800, 800);
 		startingStage.setScene(scene);
 	}
+	
+	
+	//displays the profile. 
+	public static void showProfile(User user) {
+		Scene scene = new Scene(Profile.createProfile(user), 500, 500);
+		startingStage.setScene(scene);
+	}
+	
+	//displays the order on the dashboard
+	public static void showOrderOnDashBoard(User user) {
+		Scene scene = new Scene(OrderOnDashBoard.createOrderPlacement(user), 800, 800);
+		startingStage.setScene(scene);
+	}
+	
+
 
 	
 	
