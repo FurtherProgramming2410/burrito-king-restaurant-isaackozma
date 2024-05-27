@@ -6,6 +6,7 @@ package Model;
 
 import Interface.KingItem;
 
+//this class is for meals and has the discount applied
 public class Meal implements KingItem {
 	 private static final double DISCOUNT = 3.0;
 	    private double price;
@@ -15,11 +16,13 @@ public class Meal implements KingItem {
 	        this.price = burritoPrice + friesPrice + sodaPrice - DISCOUNT;
 	    }
 
+	    //Method to get the price of the meal
 	    @Override
 	    public double getPrice() {
 	        return this.price;
 	    }
 
+	    //method to get the name of the meal
 	    @Override
 	    public String getName() {
 	        return "Meal";

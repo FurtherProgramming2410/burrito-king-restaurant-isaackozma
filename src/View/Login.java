@@ -3,6 +3,7 @@ import Controller.UserManager;
 import Model.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -46,13 +47,20 @@ public class Login {
 		//Here i created a button for the user to click once theyve entered their details
 		//positioned it
 		Button btnLogin = new Button ("Sign in");
-		pane.add(btnLogin, 1, 4);
+		
 		
 		//here is an action statement that is triggered when the button is pressed
 		//gets the text from the user name and password.
 		btnLogin.setOnAction(event -> {
 			String username = userNameTextField.getText();
 			String password = passwordEntryField.getText();
+			
+			//checks if either the username or password is empty
+			if (username.isEmpty() || password.isEmpty()) {
+		        showAlert("Login Error", "Username and password cannot be empty.");
+		        return;
+		    }
+
 			
 			//this will try to log in the user
 			//if the entry is correct then the user will be taken to the dashboard
@@ -62,9 +70,10 @@ public class Login {
 				
 				//otherwise this message will print saying there was an issue with the log in
 			}else {
-				System.out.println("Login unsuccessfull, please try again or register.");
+				showAlert("Login Error", "Invalid username or password. Please try again.");
 			}
 		});
+		pane.add(btnLogin, 1, 4);
 		
 		
 		
@@ -76,6 +85,15 @@ public class Login {
 		
 		return pane;
 		
+	}
+	
+	//method used to display alert 
+	private static void showAlert(String title, String message) {
+		Alert alert = new Alert(Alert.AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
 	}
 
 }

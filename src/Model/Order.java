@@ -1,7 +1,10 @@
 package Model;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Random;
 
 import Interface.KingItem;
 
@@ -12,6 +15,32 @@ public class Order {
 	//changed from my original A1 submission to handle the interface and meals
 	//holds objects of kingitem.
     private List<KingItem> items = new ArrayList<>();
+    private int orderID;
+    private String status;
+    private LocalDateTime orderPlacedTime;
+    private LocalDateTime orderCollectedTime;
+    
+    private static int idCounter = 0;
+    
+    
+    //constructor to initialise a order with new ID and status of order
+    //orderID generates a random number
+    //status is setting the starting status
+    //items is just initialising the items 
+    public Order() {
+    	this.orderID = generateOrderID();
+        this.status = "new";
+        this.items = new ArrayList<>();
+    	
+//    	this.orderID = ++idCounter;
+//    	this.status = "new";
+    }
+    
+    
+    //getter for the orderID
+    public int getOrderID() {
+    	return orderID;
+    }
 
     //adds the numer of kingitem objects to the order
     //I used a loop to add the item to the items list.
@@ -21,6 +50,11 @@ public class Order {
         }
     }
 
+    //generates a number for the ID
+    private int generateOrderID() {
+        return new Random().nextInt(1000);
+    }
+    
     
     //calculates the total cost by going through each food item that is within item
     //returns the cost as a double
@@ -37,7 +71,7 @@ public class Order {
     //calculates the cost of the order then subtracts the amount paid
     //will be able to tell if its enough and then give change if needed.
     //also added and else which will tell the user if the amount given is not enough.
-    public double processPayment(double amountPaid) {
+    public double processPayment(double amountPaid) {//might change name to make moresense
         double total = calculateTotal();
         double change = amountPaid - total;
         if (change >= 0) {
@@ -51,4 +85,53 @@ public class Order {
     public List<KingItem> getItems() {
         return items;
     }
+    
+    //getter for the status
+    public String getStatus() {
+        return status;
+    }
+    
+    //setter for the status
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    //getter for the order time
+    public LocalDateTime getOrderPlacedTime() {
+        return orderPlacedTime;
+    }
+    
+    // setter for the order time
+    public void setOrderPlacedTime(LocalDateTime orderPlacedTime) {
+        this.orderPlacedTime = orderPlacedTime;
+    }
+    
+    //getter for the time which orders collected
+    public LocalDateTime getOrderCollectedTime() {
+        return orderCollectedTime;
+    }
+    
+    //setter for the timme which order is collected
+    public void setOrderCollectedTime(LocalDateTime orderCollectedTime) {
+        this.orderCollectedTime = orderCollectedTime;
+    }
+    
+    
+    //override method to display the orders details
+    //order could not print accurately without it
+    @Override
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");//need to change format now that it finally works correctly
+        String formattedPlacedTime = orderPlacedTime != null ? orderPlacedTime.format(formatter) : "N/A";
+        String formattedCollectedTime = orderCollectedTime != null ? orderCollectedTime.format(formatter) : "N/A";
+        return "Order ID: " + orderID +
+               "\nStatus: " + status +
+               "\nPlaced Time: " + formattedPlacedTime +
+               "\nCollected Time: " + formattedCollectedTime + 
+               "\nTotal Price: $" + String.format("%.2f", calculateTotal()) +
+               "\nItems: " + items.size();
+    }
 }
+    
+    
+

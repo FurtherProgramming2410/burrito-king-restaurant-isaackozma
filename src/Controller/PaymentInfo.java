@@ -1,5 +1,8 @@
 package Controller;
-import java.time.LocalDate;
+//import java.time.LocalDate;
+//import java.time.format.DateTimeFormatter;
+//import java.time.format.DateTimeParseException;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -19,15 +22,27 @@ public class PaymentInfo {
 	//have the DateTimeForrmatter to make sure its month then year
 	//have the local date to make sure the card is within date, not expired already
 	//try and catch used to chceck the date
+	
 	public static boolean validateExpiryDate(String expiryDate) {
-		DateTimeFormatter formatter =DateTimeFormatter.ofPattern("MM/yy");
-		try {
-			LocalDate expiry = LocalDate.parse(expiryDate + "-01", DateTimeFormatter.ofPattern("MM/yy-dd"));
-			return expiry.isAfter(LocalDate.now());
-		}catch (DateTimeParseException e) {
-			return false;
-		}
-	}
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+        try {
+            YearMonth expiry = YearMonth.parse(expiryDate, formatter);
+            return expiry.isAfter(YearMonth.now());
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+	
+	
+//	public static boolean validateExpiryDate(String expiryDate) {
+//		DateTimeFormatter formatter =DateTimeFormatter.ofPattern("MM/yy");
+//		try {
+//			LocalDate expiry = LocalDate.parse(expiryDate + "-01", DateTimeFormatter.ofPattern("MM/yy-dd"));
+//			return expiry.isAfter(LocalDate.now());
+//		}catch (DateTimeParseException e) {
+//			return false;
+//		}
+//	}
 	
 	
 	//this method was made to check the cvv

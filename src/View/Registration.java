@@ -1,5 +1,6 @@
 package View;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import Controller.UserManager;
@@ -23,6 +24,7 @@ public class Registration {
 		pane.setHgap(10);
 		pane.setVgap(10);
 		pane.setPadding(new Insets(25, 25, 25, 25));
+		pane.getStyleClass().add("grid-pane");
 		
 		//Here i created a label for the user for the username
 		//i also positioned it
@@ -69,29 +71,52 @@ public class Registration {
 		//when clicked it gets the information from the text fields
 		//username, password, first & last name
 		Button btnRegiester = new Button("Register");
-		pane.add(btnRegiester, 1, 5);
+		
 		btnRegiester.setOnAction(event -> {
 			String username = userNameTextField.getText();
 			String password = passwordEntryField.getText();
 			String firstName = firstNameField.getText();
 			String lastName = lastNameField.getText();
 			
+			//here to check if anyting is empty 
+			 if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+				 showAlert1("Registration Error", "All fields must be filled out.");
+			        return;
+			    }
 			//boolean is used to register the user, checks if it is unique
 			boolean registered = UserManager.registerUser(username, password, firstName, lastName);
 		
 			//if the registration is ok then it will direct the user to the login area
 			if(registered ) {
-				System.out.println("registration sucessful");
+				showAlert("registration Successful", "Account successfully registered");
 				BurritoKingApp.showLogin();
 			
 			//if its not unique it will say the attempt was unsucessful.
 			}else {
-				System.out.println("Registration invalid");
+				showAlert("Registration error", "Username already exists");
 			}
 			});
-		
+			pane.add(btnRegiester, 1, 5);
 		
 		return pane;
+	}
+	
+	//used to let the user know theyve the account was successfull
+	private static void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+	}
+	
+	//used when something has gone wrong.
+	private static void showAlert1(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
 	}
 
 }

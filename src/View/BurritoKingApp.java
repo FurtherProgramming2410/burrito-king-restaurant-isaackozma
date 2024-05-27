@@ -24,7 +24,7 @@ public class BurritoKingApp extends Application{
 		//as mentioned earlier setting primaryStage to startingStage
 		//here ive set the title, i display the login form and making it visable.
 		startingStage = primaryStage;
-		startingStage.setTitle("Burrito King Restaurant");
+		startingStage.setTitle("Burrito King Restaurant - Login");
 		showLogin();
 		startingStage.show();
 	}
@@ -33,6 +33,7 @@ public class BurritoKingApp extends Application{
 	//making it the primary stage as well
 	//made it just a default size, may change in future 
 	public static void showLogin() {
+		startingStage.setTitle("Burrito King Restaurant - Login");
 		Scene scene = new Scene(Login.createLogin(), 500, 500);
 		startingStage.setScene(scene);
 	}
@@ -41,14 +42,16 @@ public class BurritoKingApp extends Application{
 	//making it the primary stage as well
 	//made it just a default size, may change in future 
 	public static void showRegistration() {
+		startingStage.setTitle("Burrito King Restaurant - Registration");
 		Scene scene = new Scene(Registration.createRegistration(),500,500);
 		startingStage.setScene(scene);
 	}
 	
-	//method for displaying the registration screen
+	//method for displaying the dashboard screen
 	//making it the primary stage as well
 	//made it just a default size, may change in future 
 	public static void showDashboard(User user) {
+		startingStage.setTitle("Burrito King Restaurant - Dashboard");
 		Scene scene = new Scene(Dashboard.createDashboard(user), 800, 800);
 		startingStage.setScene(scene);
 	}
@@ -56,12 +59,14 @@ public class BurritoKingApp extends Application{
 	
 	//displays the profile. 
 	public static void showProfile(User user) {
+		startingStage.setTitle("Burrito King Restaurant - Edit Profile");
 		Scene scene = new Scene(Profile.createProfile(user), 500, 500);
 		startingStage.setScene(scene);
 	}
 	
 	//displays the order on the dashboard
 	public static void showOrderOnDashBoard(User user) {
+		startingStage.setTitle("Burrito King Restaurant - Place Order");
 		Scene scene = new Scene(OrderOnDashBoard.createOrderPlacement(user), 800, 800);
 		startingStage.setScene(scene);
 	}
@@ -69,7 +74,7 @@ public class BurritoKingApp extends Application{
 
 
 	
-	
+	//launches the program
 	public static void main(String[] args) {
 		launch(args);
 	}
