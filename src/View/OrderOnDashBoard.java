@@ -59,6 +59,11 @@ public class OrderOnDashBoard {
         Label creditsLabel = new Label("Credits to use:"); ////////////////// vip
         TextField creditField = new TextField();
         creditField.setMaxWidth(100);
+        
+        if(!user.isVIP()) {
+        	creditsLabel.setVisible(false);
+        	creditField.setVisible(false);
+        }
 
         Button placeOrderBtn = new Button("Place Order");
         placeOrderBtn.setOnAction(e -> {
@@ -66,10 +71,10 @@ public class OrderOnDashBoard {
             String expiryDate = expiryDateField.getText();
             String cvv = cvvField.getText();
             String fakeTimeStr = fakeTimeField.getText();
-            String creditsStr = creditField.getText();//////////////////// vip
+            String creditsStr = user.isVIP() ? creditField.getText() : "0";//////////////////// vip
 
             //checks to see if any of the fields are empy
-            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || creditsStr.isEmpty()) {// added credit stuff here for vip
+            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || (user.isVIP() && creditsStr.isEmpty())) {// added credit stuff here for vip
                 showAlert("Order Error", "All fields must be filled out.");
                 return;
             }
@@ -94,30 +99,20 @@ public class OrderOnDashBoard {
                     System.out.println("Item: " + item.getName() + " Price: " + item.getPrice());
                 }
 
-                //this is used to validate the order
-                //if its all good then it process the order.
-//                if (validateOrder(cardNumber, expiryDate, cvv)) {
-//                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime);
-//                    System.out.println("Order placed: " + tempOrder);
-//                    int preparationTime = UserManager.calculatePreparationTime(tempOrder);
-//                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
-//                    Dashboard.clearTempOrder();
-//                    BurritoKingApp.showDashboard(user);
-//                    
-//                    // displayed if user add the wrong details
-//                } else {
-//                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
-//                }
-//                //makes sure time enter is correct
-//            } catch (NumberFormatException | DateTimeParseException ex) {
-//                showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
-//            }
+
                 
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
                     int credits = Integer.parseInt(creditsStr);
-                    boolean success = UserManager.useCredits(user.getUsername(), credits);
-                    if (success) {
-                        UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime);
+                    if (user.isVIP() && credits > 0) {
+                        boolean success = UserManager.useCredits(user.getUsername(), credits);
+                        if (!success) {
+                            showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
+                            return;
+                        }
+                    }
+//                    boolean success = UserManager.useCredits(user.getUsername(), credits);
+//                    if (success) {
+                        UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, user.isVIP() ? Integer.parseInt(creditsStr) : 0);
                         System.out.println("Order placed: " + tempOrder);
                         int preparationTime = UserManager.calculatePreparationTime(tempOrder);
                         showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
@@ -126,9 +121,9 @@ public class OrderOnDashBoard {
                     } else {
                         showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
                     }
-                } else {
-                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
-                }
+//                } else {
+//                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
+//                }
             } catch (NumberFormatException | DateTimeParseException ex) {
                 showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
             }
@@ -148,84 +143,7 @@ public class OrderOnDashBoard {
         pane.add(placeOrderBtn, 1, 5);
         return pane;
     }
-	//		GridPane pane = new GridPane();
-//		pane.setAlignment(Pos.CENTER);
-//		pane.setHgap(10);
-//		pane.setVgap(10);
-//		pane.setPadding(new Insets(25, 25, 25, 25 ));
-//		
-//		Label cardNumberLabel = new Label("Please enter a fake Creidt Card Number:");
-//        TextField cardNumberField = new TextField();
-//        cardNumberField.setMaxWidth(150);
-//
-//        Label expiryDateLabel = new Label("Expiry Date (MM/YY):");
-//        TextField expiryDateField = new TextField();
-//        expiryDateField.setMaxWidth(50);
-//
-//        Label cvvLabel = new Label("CVV:");
-//        TextField cvvField = new TextField();
-//        cvvField.setMaxWidth(50);
-//		
-//        Label fakeTimeLabel = new Label("Fake Time (HH:mm):");
-//        TextField fakeTimeField = new TextField();
-//        fakeTimeField.setMaxWidth(100);
-//
-//
-//		
-//		
-//        Button placeOrderBtn = new Button("Place Order");
-//        placeOrderBtn.setOnAction(e -> {
-//            String cardNumber = cardNumberField.getText();
-//            String expiryDate = expiryDateField.getText();
-//            String cvv = cvvField.getText();
-//            String fakeTimeStr = fakeTimeField.getText();
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-//
-//            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty()) {
-//                showAlert("Order Error", "All fields must be filled out.");
-//                return;
-//            }
-//
-//            try {
-//                String[] timeParts = fakeTimeStr.split(":");
-//                if (timeParts.length != 2) {
-//                    throw new DateTimeParseException("Invalid time format", fakeTimeStr, 0);
-//                }
-//
-//                int hour = Integer.parseInt(timeParts[0]);
-//                int minute = Integer.parseInt(timeParts[1]);
-//                LocalDateTime fakeTime = LocalDateTime.now().withHour(hour).withMinute(minute);
-//
-//                Order order = Dashboard.getTempOrder(); // Get the current temp order
-//                System.out.println("Placing order ID: " + order.getOrderID() + " with items: " + order.getItems().size());
-//
-//                if (validateOrder(cardNumber, expiryDate, cvv)) {
-//                    UserManager.placeOrder(user.getUsername(), order, cardNumber, expiryDate, cvv, fakeTime);
-//                    System.out.println("Order placed: " + order);
-//                    int preparationTime = UserManager.calculatePreparationTime(order);
-//                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
-//                    Dashboard.clearTempOrder(); // Clear tempOrder after placing the order
-//                    BurritoKingApp.showDashboard(user);
-//                } else {
-//                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
-//                }
-//            } catch (NumberFormatException | DateTimeParseException ex) {
-//                showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
-//            }
-//        });
-//				
-//
-//		pane.add(cardNumberLabel, 0, 0);
-//        pane.add(cardNumberField, 1, 0);
-//        pane.add(expiryDateLabel, 0, 1);
-//        pane.add(expiryDateField, 1, 1);
-//        pane.add(cvvLabel, 0, 2);
-//        pane.add(cvvField, 1, 2);
-//        pane.add(fakeTimeLabel, 0, 3);
-//        pane.add(fakeTimeField, 1, 3);
-//        pane.add(placeOrderBtn, 1, 4);
-//        return pane;
-//	}
+	
 	
 	//
 	private static void itemsBeingOrdered(Order order, String itemName, int quantity) {

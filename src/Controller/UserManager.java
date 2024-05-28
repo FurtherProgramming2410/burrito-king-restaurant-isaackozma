@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import Interface.KingItem;
+import Model.Meal;
 import Model.Order;
 import Model.User;
 
@@ -22,6 +23,7 @@ public class UserManager {
 	//this map stores users info
 	private static Map<String, User> users = new HashMap<>();
 	private static User currentUser;//addddddddddddddddddddddddddddddddddd
+	private static int friesRemain = 0;
 	
 	//this method basically just ensures user name and password are unique
 	//otherwise the program will not allow the creation of the account
@@ -106,7 +108,7 @@ public class UserManager {
 	// this method is used to validate the payment details
 	//tells users if it worked or not
 	//when payments is successful then the order will be added to the list
-	 public static void placeOrder(String username, Order order, String cardNumber, String expiryDate, String cvv, LocalDateTime orderPlacedTime) {
+	 public static void placeOrder(String username, Order order, String cardNumber, String expiryDate, String cvv, LocalDateTime orderPlacedTime, int creditsUsed) {
         if (PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate)
                 && PaymentInfo.validateCVV(cvv)) {
             User user = users.get(username);
@@ -118,6 +120,18 @@ public class UserManager {
                 }
                 order.setOrderPlacedTime(orderPlacedTime);
                 order.setStatus("placed");
+                
+                double totalAmount = order.calculateTotal();
+                double finalAmount = totalAmount;
+                
+                if(user.isVIP()) {
+                	finalAmount = totalAmount -(creditsUsed / 100.0);//for credits
+                	user.addCredits((int) finalAmount);//for credits
+                	user.setCredits(user.getCredits()- creditsUsed);//for credits
+                }
+                
+                order.setTotalAmount(finalAmount);//for credits
+                
                 user.addOrder(order);
                 System.out.println("Payment success: " + username + " Order ID: " + order.getOrderID() + " Items: " + order.getItems().size());
             }
@@ -164,28 +178,7 @@ public class UserManager {
 		}
 				
 	
-//	public static void exportOrders(String username, List<Order> orders, String filePath) {
-//	    User user = users.get(username);
-//	    if (user != null && orders != null && !orders.isEmpty()) {
-//	        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-//	            // Write CSV header
-//	            writer.write("OrderID,Status,PlacedTime,CollectedTime,TotalPrice,Items");
-//	            writer.newLine();
-//	            
-//	            // Write order details
-//	            for (Order order : orders) {
-//	                writer.write(order.getOrderID() + "," + order.getStatus() + "," + 
-//	                             (order.getOrderPlacedTime() != null ? order.getOrderPlacedTime() : "") + "," + 
-//	                             (order.getOrderCollectedTime() != null ? order.getOrderCollectedTime() : "") + "," + 
-//	                             order.calculateTotal() + "," + order.getItems().size());
-//	                writer.newLine();
-//	            }
-//	            System.out.println("Orders exported successfully to " + filePath);
-//	        } catch (IOException e) {
-//	            System.out.println("Failed to export orders: " + e.getMessage());
-//	        }
-//	    }
-//	}
+
 	
 	
 	//method used to cancel the order
@@ -254,22 +247,42 @@ public class UserManager {
 	public static int calculatePreparationTime(Order order) {
         int burritosCount = 0;
         int friesCount = 0;
+        int mealsCount = 0;
 
         for (KingItem item : order.getItems()) {
             if (item.getName().equalsIgnoreCase("burrito")) {
                 burritosCount++;
             } else if (item.getName().equalsIgnoreCase("fries")) {
                 friesCount++;
+            }else if (item instanceof Meal) {
+            	mealsCount++;
             }
         }
+        
+        int totalBurritos = burritosCount + mealsCount;
+        int totalFries = friesCount + mealsCount;
 
-        int burritosPrepTime = (int) Math.ceil(burritosCount / 2.0) * 9;
-        int friesPrepTime = 0;
-        if (friesCount > 0) {
-            friesPrepTime = ((friesCount - 1) / 5 + 1) * 8;
-        }
+        int burritosPrepTime = (int) Math.ceil(totalBurritos / 2.0) * 9; // changed
+        int friesPrepTime = calculateFriesWaitingTime(totalFries);
+//        int friesPrepTime = 0;
+//        if (totalFries > 0) {
+//            friesPrepTime = ((totalFries - 1) / 5 + 1) * 8;
+//        }
         return Math.max(burritosPrepTime, friesPrepTime);
     }
+	
+	 private static int calculateFriesWaitingTime(int friesNeeded) {
+	        int numberOfBatchesCooked = 0;
+	        int totalFriesRequired = friesNeeded - friesRemain;
+	        if (totalFriesRequired > 0) {
+	            numberOfBatchesCooked = (int) Math.ceil((double) totalFriesRequired / 5);
+	            int excessFriesFromLastBatch = (numberOfBatchesCooked * 5) - totalFriesRequired;
+	            friesRemain = Math.min(excessFriesFromLastBatch, 5);
+	        } else {
+	            friesRemain -= friesNeeded;
+	        }
+	        return numberOfBatchesCooked * 8;
+	    }
 	
 	//method  to get tje status or an order by its ID
 	public static String getOrderStatus(int orderID, User user) {

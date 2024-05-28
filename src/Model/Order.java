@@ -21,6 +21,8 @@ public class Order {
     private LocalDateTime orderCollectedTime;
     private double actualPaidAmount; //change this name!!!!!!!!!!!!!
     
+    private double totalAmount;// for credits
+    
     private static int idCounter = 0;
     
     
@@ -139,6 +141,17 @@ public class Order {
         this.orderCollectedTime = orderCollectedTime;
     }
     
+    
+    	///////////////////////for credits
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+    
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+    
+    ////////////for credits
     
     //override method to display the orders details
     //order could not print accurately without it

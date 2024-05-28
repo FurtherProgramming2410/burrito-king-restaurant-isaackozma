@@ -99,10 +99,10 @@ public class Dashboard {
 	    
 	    Button upgradeToVIPBtn = new Button("Upgrade to VIP");
         upgradeToVIPBtn.setOnAction(e -> showVIPUpgradeDialog(user));
-        
-        if (user.isVIP()) {
-        	addVIPFeatures(pane, user);
-        }
+//        
+//        if (user.isVIP()) {
+//        	addVIPFeatures(pane, user);
+//        }
 
         pane.add(upgradeToVIPBtn,  2,1);
 //	    vbox.getChildren().add(viewOrdersBtn);
@@ -122,8 +122,11 @@ public class Dashboard {
         
         
         
-		HBox userFoodChoice = createUserFoodChoice();
+		HBox userFoodChoice = createUserFoodChoice(user);//changed to user
 		pane.add(userFoodChoice,  0,2, 2, 1);
+		
+		Label basketLabel = new Label("Shopping Basket:");
+		pane.add(basketLabel, 0, 3, 2, 1);
 		
 		//displays the list of active orders
 	    ListView<KingItem> basketListView = new ListView<>(basketItems);
@@ -139,10 +142,10 @@ public class Dashboard {
             }
         });
         basketListView.setPrefHeight(150);
-        pane.add(basketListView, 0, 3, 2, 1);
+        pane.add(basketListView, 0, 4, 2, 1);
         
         HBox basketControls = createBasketControls(basketListView);
-	    pane.add(basketControls, 0,4,2,1);
+	    pane.add(basketControls, 0,5,2,1);
 	    
 	    Button payForOrderBtn = new Button("Pay for Order");
         payForOrderBtn.setOnAction(e -> {
@@ -157,12 +160,12 @@ public class Dashboard {
         payForOrderBox.setAlignment(Pos.CENTER);
         payForOrderBox.getChildren().add(payForOrderBtn);
 
-        pane.add(payForOrderBox, 0, 5, 2, 1);
+        pane.add(payForOrderBox, 0, 6, 2, 1);
 //        pane.add(payForOrderBtn, 0, 5, 2, 1);
 	    
 		
 		VBox actionButtonArea = createActionButtons(user);
-	    pane.add(actionButtonArea, 0, 6, 2, 1); 
+	    pane.add(actionButtonArea, 0, 7, 2, 1); 
 	    
 //	    VBox ordersDisplay = createOrdersDisplay(user);//might get rid of
 //        pane.add(ordersDisplay, 0, 5, 2, 1);
@@ -222,7 +225,7 @@ public class Dashboard {
         pane.setPadding(new Insets(25, 25, 25, 25));
 
         // Heading for email input
-        Label emailHeading = new Label("Enter your email to receive promotions:");
+        Label emailHeading = new Label("Would you like to receive promotion information via email?");
         pane.add(emailHeading, 0, 0, 2, 1);
 
         // Text field for email input
@@ -235,7 +238,7 @@ public class Dashboard {
         confirmBtn.setOnAction(e -> {
             String email = emailField.getText();
             if (UserManager.upgradeToVIP(user.getUsername(), email)) {
-                showAlert("VIP Upgrade", "You have successfully upgraded to VIP!");
+                showAlert("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features");
                 stage.close();
             } else {
                 showAlert("Error", "Failed to upgrade to VIP. Please enter a valid email.");
@@ -250,53 +253,53 @@ public class Dashboard {
     }
 	
 	
-	private static void addVIPFeatures(GridPane pane, User user) {
-		Button orderMealBtn = new Button("Order meal");
-		 orderMealBtn.setOnAction(e -> {
-			 if (user.isVIP()) {
-	                addMealsToOrder(tempOrder, "1"); // Assuming 1 meal for simplicity, can be adjusted
-	                showAlert("Order Meal", "A meal (burrito, fries, soda) has been added to your order with a $3 discount.");
-	            }
-	        
-	});
-		 pane.add(orderMealBtn, 0, 2);
-		 
-		 Button useCreditsBtn = new Button("Use Credits");
-		 useCreditsBtn.setOnAction(e -> {
-	            Stage stage = new Stage();
-	            GridPane creditPane = new GridPane();
-	            creditPane.setAlignment(Pos.CENTER);
-	            creditPane.setHgap(10);
-	            creditPane.setVgap(10);
-	            creditPane.setPadding(new Insets(25, 25, 25, 25));
-
-	            Label creditLabel = new Label("Enter credits to use:");
-	            TextField creditField = new TextField();
-	            creditField.setPromptText("Credits");
-	            Button confirmBtn = new Button("Confirm");
-
-	            confirmBtn.setOnAction(ev -> {
-	                int credits = Integer.parseInt(creditField.getText());
-	                boolean success = UserManager.useCredits(user.getUsername(), credits);
-	                if (success) {
-	                    showAlert("Credits Used", "Credits have been successfully applied to your order.");
-	                } else {
-	                    showAlert("Error", "Failed to apply credits. Please check your credit balance.");
-	                }
-	                stage.close();
-	            });
-
-	            creditPane.add(creditLabel, 0, 0);
-	            creditPane.add(creditField, 1, 0);
-	            creditPane.add(confirmBtn, 1, 1);
-
-	            Scene scene = new Scene(creditPane, 300, 200);
-	            stage.setScene(scene);
-	            stage.setTitle("Use Credits");
-	            stage.show();
-	        });
-	        pane.add(useCreditsBtn, 0, 3);
-	    }
+//	private static void addVIPFeatures(GridPane pane, User user) {
+////		Button orderMealBtn = new Button("Order meal");
+////		 orderMealBtn.setOnAction(e -> {
+////			 if (user.isVIP()) {
+////	                addMealsToOrder(tempOrder, "1"); // Assuming 1 meal for simplicity, can be adjusted
+////	                showAlert("Order Meal", "A meal (burrito, fries, soda) has been added to your order with a $3 discount.");
+////	            }
+////	        
+////	});
+////		 pane.add(orderMealBtn, 0, 2);
+//		 
+//		 Button useCreditsBtn = new Button("Use Credits");
+//		 useCreditsBtn.setOnAction(e -> {
+//	            Stage stage = new Stage();
+//	            GridPane creditPane = new GridPane();
+//	            creditPane.setAlignment(Pos.CENTER);
+//	            creditPane.setHgap(10);
+//	            creditPane.setVgap(10);
+//	            creditPane.setPadding(new Insets(25, 25, 25, 25));
+//
+//	            Label creditLabel = new Label("Enter credits to use:");
+//	            TextField creditField = new TextField();
+//	            creditField.setPromptText("Credits");
+//	            Button confirmBtn = new Button("Confirm");
+//
+//	            confirmBtn.setOnAction(ev -> {
+//	                int credits = Integer.parseInt(creditField.getText());
+//	                boolean success = UserManager.useCredits(user.getUsername(), credits);
+//	                if (success) {
+//	                    showAlert("Credits Used", "Credits have been successfully applied to your order.");
+//	                } else {
+//	                    showAlert("Error", "Failed to apply credits. Please check your credit balance.");
+//	                }
+//	                stage.close();
+//	            });
+//
+//	            creditPane.add(creditLabel, 0, 0);
+//	            creditPane.add(creditField, 1, 0);
+//	            creditPane.add(confirmBtn, 1, 1);
+//
+//	            Scene scene = new Scene(creditPane, 300, 200);
+//	            stage.setScene(scene);
+//	            stage.setTitle("Use Credits");
+//	            stage.show();
+//	        });
+//	        pane.add(useCreditsBtn, 0, 3);
+//	    }
 	
 	////////////////////////////vip stuff
 	
@@ -355,7 +358,7 @@ public class Dashboard {
 	
 	//method for the food choice.
 	//creates the layot for the foodchoice
-	 private static HBox createUserFoodChoice() {
+	 private static HBox createUserFoodChoice(User user) {//added user user to it
 		 HBox hbox = new HBox(10);
 		    hbox.setPadding(new Insets(20, 0, 20, 0));
 		    hbox.setAlignment(Pos.CENTER);
@@ -372,24 +375,38 @@ public class Dashboard {
 		    TextField sodaQty = new TextField("0");
 		    sodaQty.setMaxWidth(50);
 
-		    Label mealLabel = new Label("Meal - $15");
-		    TextField mealQty = new TextField("0");
-		    mealQty.setMaxWidth(50);
+		    hbox.getChildren().addAll(burritoLabel, burritoQty, friesLabel, friesQty, sodaLabel, sodaQty);
+		    
+		    TextField mealQty = null;
+		    if (user.isVIP()) {
+		    	Label mealLabel = new Label("Meal - $15");
+		        mealQty = new TextField("0");
+		        mealQty.setMaxWidth(50);
+		        hbox.getChildren().addAll(mealLabel, mealQty);
+		    }
 
 		    //adding the items to the order
-		    Button addToOrder = new Button("Add to order:");
+		    TextField finalMealQty = mealQty;
+		    Button addToOrder = new Button("Add to Basket:");
 		    addToOrder.setOnAction(e -> {
 		        addItemsToOrder(tempOrder, "Burrito", burritoQty.getText());
 		        addItemsToOrder(tempOrder, "Fries", friesQty.getText());
 		        addItemsToOrder(tempOrder, "Soda", sodaQty.getText());
-		        addItemsToOrder(tempOrder, "Meal", mealQty.getText());
+		        if (user.isVIP() && finalMealQty != null) {
+		            addItemsToOrder(tempOrder, "Meal", finalMealQty.getText());
+		        }
+		        
 		        basketItems.clear();
 		        basketItems.addAll(tempOrder.getItems());
-		        System.out.println("Added to basket: Burritos: " + burritoQty.getText() + ", Fries: " + friesQty.getText() + ", Sodas: " + sodaQty.getText() + ", Meals: " + mealQty.getText());
+		        System.out.println("Added to basket: Burritos: " + burritoQty.getText() + ", Fries: " + friesQty.getText() + ", Sodas: " + sodaQty.getText());
+		        if (user.isVIP() && finalMealQty != null) {
+		            System.out.println("Meals: " + finalMealQty.getText());
+		        }
 		        System.out.println("Current tempOrder items: " + tempOrder.getItems().size());
 		    });
 
-		    hbox.getChildren().addAll(burritoLabel, burritoQty, friesLabel, friesQty, sodaLabel, sodaQty, mealLabel, mealQty, addToOrder);
+		    hbox.getChildren().add(addToOrder);
+//		    hbox.getChildren().addAll(burritoLabel, burritoQty, friesLabel, friesQty, sodaLabel, sodaQty, mealLabel, mealQty, addToOrder);
 		    return hbox;
 		}
 	
@@ -607,72 +624,7 @@ public class Dashboard {
 		    
 		    
 		    
-		    /////////////////////////////////////////////// vip stuff
 		   
-		    
-		    
-//		    Button upgradeToVIPBtn = new Button("Upgrade to VIP");
-//		    upgradeToVIPBtn.setOnAction(e -> {
-//		    	TextField emailField = new TextField();
-//		    	emailField.setPromptText("Enter Email");
-//		    	
-//		    	Button confirmUpgradeBtn = new Button ("Upgrade");
-//		    	confirmUpgradeBtn.setOnAction(ev -> {
-//		    		String email = emailField.getText();
-//		    		if(email.isEmpty()) {
-//		    			showAlert("Upgrade Error", "Please enter a valid email address.");
-//		    		}else {
-//		    			boolean upgraded = UserManager.upgradeToVIP(user.getUsername(), email);
-//		    			if(upgraded) {
-//		    				showAlert("Upgrade Sucessful", "You are now a VIP!!");
-//		    			}else {
-//		    				showAlert("Upgrade error", "You are either already a VIP or the email is invalid.");
-//		    			}
-//		    		}
-//		    	});
-//		    	
-//		    	VBox upgradeBox = new VBox(10, emailField, confirmUpgradeBtn);
-//		    	upgradeBox.setAlignment(Pos.CENTER);
-//		    	upgradeBox.setPadding(new Insets(10));
-//		    	Scene upgradeScene = new Scene(upgradeBox, 300, 200);
-//		    	Stage upgradeStage = new Stage();
-//		    	upgradeStage.setTitle("Upgrade To VIP");
-//		    	upgradeStage.setScene(upgradeScene);
-//		    	upgradeStage.show();
-//		    });
-//		    vbox.getChildren().add(upgradeToVIPBtn);
-//		    
-//		    Button useCreditsBtn = new Button("Use Credits for Order");
-//	        useCreditsBtn.setOnAction(e -> {
-//	            TextField creditsField = new TextField();
-//	            creditsField.setPromptText("Enter credits");
-//	            Button confirmUseCreditsBtn = new Button("Use");
-//	            confirmUseCreditsBtn.setOnAction(ev -> {
-//	                try {
-//	                    int credits = Integer.parseInt(creditsField.getText());
-//	                    boolean success = UserManager.useCredits(user.getUsername(), credits);
-//	                    if (success) {
-//	                        showAlert("Credits Used", credits + " credits have been used for your order.");
-//	                    } else {
-//	                        showAlert("Credits Error", "You do not have enough credits.");
-//	                    }
-//	                } catch (NumberFormatException ex) {
-//	                    showAlert("Input Error", "Please enter a valid number.");
-//	                }
-//	            });
-//
-//	            VBox creditsBox = new VBox(10, creditsField, confirmUseCreditsBtn);
-//	            creditsBox.setAlignment(Pos.CENTER);
-//	            creditsBox.setPadding(new Insets(10));
-//	            Scene creditsScene = new Scene(creditsBox, 200, 150);
-//	            Stage creditsStage = new Stage();
-//	            creditsStage.setTitle("Use Credits");
-//	            creditsStage.setScene(creditsScene);
-//	            creditsStage.show();
-//	        });
-//	        vbox.getChildren().add(useCreditsBtn);
-	        
-	        ////////////////////////////////////////////// vip stuff
 
 		    //button to logout
 		    //clears the session and takes user back to login screen
@@ -790,8 +742,7 @@ public class Dashboard {
 	    }
 	 
 	 
-	 
-	 //here is where the ive created a display for the users orders. 
+	
 	 
 
 
