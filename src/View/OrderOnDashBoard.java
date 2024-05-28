@@ -55,6 +55,10 @@ public class OrderOnDashBoard {
         Label fakeTimeLabel = new Label("Fake Time (HH:mm):");
         TextField fakeTimeField = new TextField();
         fakeTimeField.setMaxWidth(100);
+        
+        Label creditsLabel = new Label("Credits to use:"); ////////////////// vip
+        TextField creditField = new TextField();
+        creditField.setMaxWidth(100);
 
         Button placeOrderBtn = new Button("Place Order");
         placeOrderBtn.setOnAction(e -> {
@@ -62,9 +66,10 @@ public class OrderOnDashBoard {
             String expiryDate = expiryDateField.getText();
             String cvv = cvvField.getText();
             String fakeTimeStr = fakeTimeField.getText();
+            String creditsStr = creditField.getText();//////////////////// vip
 
             //checks to see if any of the fields are empy
-            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty()) {
+            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || creditsStr.isEmpty()) {// added credit stuff here for vip
                 showAlert("Order Error", "All fields must be filled out.");
                 return;
             }
@@ -91,22 +96,43 @@ public class OrderOnDashBoard {
 
                 //this is used to validate the order
                 //if its all good then it process the order.
+//                if (validateOrder(cardNumber, expiryDate, cvv)) {
+//                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime);
+//                    System.out.println("Order placed: " + tempOrder);
+//                    int preparationTime = UserManager.calculatePreparationTime(tempOrder);
+//                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
+//                    Dashboard.clearTempOrder();
+//                    BurritoKingApp.showDashboard(user);
+//                    
+//                    // displayed if user add the wrong details
+//                } else {
+//                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
+//                }
+//                //makes sure time enter is correct
+//            } catch (NumberFormatException | DateTimeParseException ex) {
+//                showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
+//            }
+                
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
-                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime);
-                    System.out.println("Order placed: " + tempOrder);
-                    int preparationTime = UserManager.calculatePreparationTime(tempOrder);
-                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
-                    Dashboard.clearTempOrder();
-                    BurritoKingApp.showDashboard(user);
-                    
-                    // displayed if user add the wrong details
+                    int credits = Integer.parseInt(creditsStr);
+                    boolean success = UserManager.useCredits(user.getUsername(), credits);
+                    if (success) {
+                        UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime);
+                        System.out.println("Order placed: " + tempOrder);
+                        int preparationTime = UserManager.calculatePreparationTime(tempOrder);
+                        showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
+                        Dashboard.clearTempOrder();
+                        BurritoKingApp.showDashboard(user);
+                    } else {
+                        showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
+                    }
                 } else {
                     showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
                 }
-                //makes sure time enter is correct
             } catch (NumberFormatException | DateTimeParseException ex) {
                 showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
             }
+                
         });
 
         pane.add(cardNumberLabel, 0, 0);
@@ -117,7 +143,9 @@ public class OrderOnDashBoard {
         pane.add(cvvField, 1, 2);
         pane.add(fakeTimeLabel, 0, 3);
         pane.add(fakeTimeField, 1, 3);
-        pane.add(placeOrderBtn, 1, 4);
+        pane.add(creditsLabel, 0, 4);
+        pane.add(creditField, 1, 4);
+        pane.add(placeOrderBtn, 1, 5);
         return pane;
     }
 	//		GridPane pane = new GridPane();

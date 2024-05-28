@@ -341,7 +341,8 @@ public class Restaurant {
                     String input = scanner.nextLine();
                     if (!input.isEmpty() && input.matches("-?\\d+(\\.\\d+)?")) {
                         double amountPaid = Double.parseDouble(input);
-                        double change = order.processPayment(amountPaid);
+//                        double change = order.processPayment(amountPaid);
+                        double change = order.processPayment(amountPaid, 0);/////////////////added for VIP 
                         
                         if (change >= 0) {
                             System.out.println("Change returned $" + String.format("%.2f", change));

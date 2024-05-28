@@ -34,6 +34,42 @@ public class UserManager {
 		
 	}
 	
+	////////////////////////////////////////////// vip stufff
+	public static boolean upgradeToVIP(String username, String email) {
+        User user = users.get(username);
+        if (user != null && email != null && !email.trim().isEmpty()) {
+            user.setVIP(true);
+            user.setEmail(email);
+            return true;
+        }
+        return false;
+    }
+	
+	public static void addCredits(String username, int credits) {
+		User user = users.get(username);
+		if (user != null) {
+			user.addCredits(credits);
+		}
+	}
+	
+	public static boolean useCredits(String username, int creditsToUse) {
+	    User user = users.get(username);
+	    if (user != null) {
+	        int userCredits = user.getCredits();
+	        if (creditsToUse <= userCredits) {
+	            user.setCredits(userCredits - creditsToUse);
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
+	///////////////////////////////vip stuff
+	
+	public static User getUser(String username) {/// added with vip stuff, might get rid of
+		return users.get(username);
+	}
+	
 	//this method is to ensure the login is correct with the username and password
 	public static User loginUser(String username, String password) {
 		User user = users.get(username);

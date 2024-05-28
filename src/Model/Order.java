@@ -19,6 +19,7 @@ public class Order {
     private String status;
     private LocalDateTime orderPlacedTime;
     private LocalDateTime orderCollectedTime;
+    private double actualPaidAmount; //change this name!!!!!!!!!!!!!
     
     private static int idCounter = 0;
     
@@ -71,14 +72,36 @@ public class Order {
     //calculates the cost of the order then subtracts the amount paid
     //will be able to tell if its enough and then give change if needed.
     //also added and else which will tell the user if the amount given is not enough.
-    public double processPayment(double amountPaid) {//might change name to make moresense
+//    public double processPayment(double amountPaid, int creditsToUse) {//might change name to make moresense also credits to use was added!!
+//        double total = calculateTotal();
+//        double creditValue = creditsToUse / 100.0; //Added for VIP
+//        double finalTotal = total - creditValue;//// added for VIP
+//        double change = amountPaid - finalTotal; /// was double change = amountPaid - total;
+//        
+//        
+//        if (change >= 0) {
+//        	this.actualPaidAmount = total; ////////////check this, may fail, added for VIP
+//            return change;
+//        } else {
+//            return -1; 
+//        }
+//    }
+    
+    public double processPayment(double amountPaid, int creditsUsed) {// added credits as well ,need to test to see if it works correctly
         double total = calculateTotal();
-        double change = amountPaid - total;
+        double creditValue = creditsUsed / 100.0;
+        double finalTotal = total - creditValue;
+        double change = amountPaid - finalTotal;
         if (change >= 0) {
             return change;
         } else {
-            return -1; 
+            return -1;
         }
+    }
+    
+    
+    public double getActualPaidAmount() {
+    	return actualPaidAmount;
     }
     
     //returns the list of objects to the order.

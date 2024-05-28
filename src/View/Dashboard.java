@@ -69,21 +69,63 @@ public class Dashboard {
 		pane.setVgap(10);
 		pane.setPadding(new Insets(25, 25, 25, 25));
 		
+		
+		
 		//here I have the program display the the users first name and last name
 		//have not added the the active order as of yet.
 		//not sure if i will use VBox or HBox at this moment
-		Label displayName = new Label(user.getFirstName() +" " + user.getLastName());
-		pane.add(displayName, 0, 0, 2, 1);
-		
+		Label displayName = new Label("Burrito King, Welcome: " + user.getFirstName() + " " + user.getLastName());
+        pane.add(displayName, 1, 0);
+        
+        Button viewOrdersBtn = new Button("View your Orders");
+	    viewOrdersBtn.setOnAction(e -> {
+	        ListView<String> orderListView = new ListView<>();
+	        ObservableList<String> orders = FXCollections.observableArrayList();
+	        for (Order order : user.getOrders()) {
+	            orders.add(order.toString());
+	        }
+	        
+	        //shows the orders in new window
+	        orderListView.setItems(orders);
+	        Stage orderStage = new Stage();
+	        VBox orderBox = new VBox(orderListView);
+	        orderBox.setPadding(new Insets(10));
+	        Scene orderScene = new Scene(orderBox, 300, 400);
+	        orderStage.setScene(orderScene);
+	        orderStage.setTitle("your orders");//change this!
+	        orderStage.show();
+	    });
+	    pane.add(viewOrdersBtn, 0,1, 2, 1);
+	    
+	    Button upgradeToVIPBtn = new Button("Upgrade to VIP");
+        upgradeToVIPBtn.setOnAction(e -> showVIPUpgradeDialog(user));
+        
+        if (user.isVIP()) {
+        	addVIPFeatures(pane, user);
+        }
+
+        pane.add(upgradeToVIPBtn,  2,1);
+//	    vbox.getChildren().add(viewOrdersBtn);
+	    
+        
+        
+      //button for editing profile    
+  		Button editProfileBtn = new Button("Edit Profile");
+        editProfileBtn.setOnAction(e -> BurritoKingApp.showProfile(user));
+        pane.add(editProfileBtn, 3, 1);
+        
+        HBox topButtons = new HBox(10);
+        topButtons.setAlignment(Pos.CENTER);
+        topButtons.getChildren().addAll(displayName, viewOrdersBtn, upgradeToVIPBtn, editProfileBtn);
+        pane.add(topButtons, 0, 0, 2, 1);
+        
+        
+        
+        
 		HBox userFoodChoice = createUserFoodChoice();
-		pane.add(userFoodChoice,  0,1, 2, 1);
+		pane.add(userFoodChoice,  0,2, 2, 1);
 		
-		VBox actionButtonArea = createActionButtons(user);
-	    pane.add(actionButtonArea, 0, 2, 2, 1); 
-	    
-	    
-	    
-	    //displays the list of active orders
+		//displays the list of active orders
 	    ListView<KingItem> basketListView = new ListView<>(basketItems);
         basketListView.setCellFactory(param -> new javafx.scene.control.ListCell<KingItem>() {
             @Override
@@ -96,13 +138,54 @@ public class Dashboard {
                 }
             }
         });
+        basketListView.setPrefHeight(150);
         pane.add(basketListView, 0, 3, 2, 1);
-	    
-	    HBox basketControls = createBasketControls(basketListView);
+        
+        HBox basketControls = createBasketControls(basketListView);
 	    pane.add(basketControls, 0,4,2,1);
 	    
-	    VBox ordersDisplay = createOrdersDisplay(user);
-        pane.add(ordersDisplay, 0, 5, 2, 1);
+	    Button payForOrderBtn = new Button("Pay for Order");
+        payForOrderBtn.setOnAction(e -> {
+	        if (!tempOrder.getItems().isEmpty()) {
+	            System.out.println("Placing new order for user: " + user.getUsername());//get rid of logging statments 
+	            BurritoKingApp.showOrderOnDashBoard(user);
+	        } else {
+	            System.out.println("Add items to your basket before placing an order.");
+	        }
+	    });
+        HBox payForOrderBox = new HBox();
+        payForOrderBox.setAlignment(Pos.CENTER);
+        payForOrderBox.getChildren().add(payForOrderBtn);
+
+        pane.add(payForOrderBox, 0, 5, 2, 1);
+//        pane.add(payForOrderBtn, 0, 5, 2, 1);
+	    
+		
+		VBox actionButtonArea = createActionButtons(user);
+	    pane.add(actionButtonArea, 0, 6, 2, 1); 
+	    
+//	    VBox ordersDisplay = createOrdersDisplay(user);//might get rid of
+//        pane.add(ordersDisplay, 0, 5, 2, 1);
+	    
+        
+        
+//        Button newOrderBtn = new Button("Pay for Order");
+//
+//		 newOrderBtn.setOnAction(e -> {
+//		        if (!tempOrder.getItems().isEmpty()) {
+//		            System.out.println("Placing new order for user: " + user.getUsername());//get rid of logging statments 
+//		            BurritoKingApp.showOrderOnDashBoard(user);
+//		        } else {
+//		            System.out.println("Add items to your basket before placing an order.");
+//		        }
+//		    });
+//		    vbox.getChildren().add(newOrderBtn);
+	    
+	    
+	    
+	    
+	    
+	    
         
 	    return pane;
 	    
@@ -128,6 +211,94 @@ public class Dashboard {
 //            System.out.println("Add items to your basket before placing an order.");
 //        }
 //    });
+	
+	///////////////////////////////////////////////vip stuff
+	private static void showVIPUpgradeDialog(User user) {
+        Stage stage = new Stage();
+        GridPane pane = new GridPane();
+        pane.setAlignment(Pos.CENTER);
+        pane.setHgap(10);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(25, 25, 25, 25));
+
+        // Heading for email input
+        Label emailHeading = new Label("Enter your email to receive promotions:");
+        pane.add(emailHeading, 0, 0, 2, 1);
+
+        // Text field for email input
+        TextField emailField = new TextField();
+        emailField.setPromptText("Email");
+        pane.add(emailField, 0, 1, 2, 1);
+
+        // Confirm button
+        Button confirmBtn = new Button("Confirm");
+        confirmBtn.setOnAction(e -> {
+            String email = emailField.getText();
+            if (UserManager.upgradeToVIP(user.getUsername(), email)) {
+                showAlert("VIP Upgrade", "You have successfully upgraded to VIP!");
+                stage.close();
+            } else {
+                showAlert("Error", "Failed to upgrade to VIP. Please enter a valid email.");
+            }
+        });
+        pane.add(confirmBtn, 0, 2, 2, 1);
+
+        Scene scene = new Scene(pane, 400, 200);
+        stage.setScene(scene);
+        stage.setTitle("Upgrade to VIP");
+        stage.show();
+    }
+	
+	
+	private static void addVIPFeatures(GridPane pane, User user) {
+		Button orderMealBtn = new Button("Order meal");
+		 orderMealBtn.setOnAction(e -> {
+			 if (user.isVIP()) {
+	                addMealsToOrder(tempOrder, "1"); // Assuming 1 meal for simplicity, can be adjusted
+	                showAlert("Order Meal", "A meal (burrito, fries, soda) has been added to your order with a $3 discount.");
+	            }
+	        
+	});
+		 pane.add(orderMealBtn, 0, 2);
+		 
+		 Button useCreditsBtn = new Button("Use Credits");
+		 useCreditsBtn.setOnAction(e -> {
+	            Stage stage = new Stage();
+	            GridPane creditPane = new GridPane();
+	            creditPane.setAlignment(Pos.CENTER);
+	            creditPane.setHgap(10);
+	            creditPane.setVgap(10);
+	            creditPane.setPadding(new Insets(25, 25, 25, 25));
+
+	            Label creditLabel = new Label("Enter credits to use:");
+	            TextField creditField = new TextField();
+	            creditField.setPromptText("Credits");
+	            Button confirmBtn = new Button("Confirm");
+
+	            confirmBtn.setOnAction(ev -> {
+	                int credits = Integer.parseInt(creditField.getText());
+	                boolean success = UserManager.useCredits(user.getUsername(), credits);
+	                if (success) {
+	                    showAlert("Credits Used", "Credits have been successfully applied to your order.");
+	                } else {
+	                    showAlert("Error", "Failed to apply credits. Please check your credit balance.");
+	                }
+	                stage.close();
+	            });
+
+	            creditPane.add(creditLabel, 0, 0);
+	            creditPane.add(creditField, 1, 0);
+	            creditPane.add(confirmBtn, 1, 1);
+
+	            Scene scene = new Scene(creditPane, 300, 200);
+	            stage.setScene(scene);
+	            stage.setTitle("Use Credits");
+	            stage.show();
+	        });
+	        pane.add(useCreditsBtn, 0, 3);
+	    }
+	
+	////////////////////////////vip stuff
 	
 	private static void placeNewOrder(User user) {
 	    if (!tempOrder.getItems().isEmpty()) {
@@ -238,57 +409,16 @@ public class Dashboard {
 	private static VBox createActionButtons(User user) {//dont like this name change later
 	    VBox vbox = new VBox(10);
 	    vbox.setAlignment(Pos.CENTER);
-	    vbox.setPadding(new Insets(10, 0, 10, 0));
+	    vbox.setPadding(new Insets(10, 10, 10, 10));
 
-	    //allows for users to view their orders 
-	    Button viewOrdersBtn = new Button("View your Orders");
-	    viewOrdersBtn.setOnAction(e -> {
-	        ListView<String> orderListView = new ListView<>();
-	        ObservableList<String> orders = FXCollections.observableArrayList();
-	        for (Order order : user.getOrders()) {
-	            orders.add(order.toString());
-	        }
-	        
-	        //shows the orders in new window
-	        orderListView.setItems(orders);
-	        Stage orderStage = new Stage();
-	        VBox orderBox = new VBox(orderListView);
-	        orderBox.setPadding(new Insets(10));
-	        Scene orderScene = new Scene(orderBox, 300, 400);
-	        orderStage.setScene(orderScene);
-	        orderStage.setTitle("your orders");//change this!
-	        orderStage.show();
-	    });
-	    vbox.getChildren().add(viewOrdersBtn);
-			
-			
-		
-			
+	    
 		//this method is to make a new order. 
-		Button newOrderBtn = new Button("Place new order");// dont like this name anymore, better name needed.
-		
-//		newOrderBtn.setOnAction(e -> {
-//	        placeNewOrder(user); // Call the placeNewOrder method here
-//	    });
-//	    vbox.getChildren().add(newOrderBtn);
 		
 		
-		 newOrderBtn.setOnAction(e -> {
-		        if (!tempOrder.getItems().isEmpty()) {
-		            System.out.println("Placing new order for user: " + user.getUsername());//get rid of logging statments 
-		            BurritoKingApp.showOrderOnDashBoard(user);
-		        } else {
-		            System.out.println("Add items to your basket before placing an order.");
-		        }
-		    });
-		    vbox.getChildren().add(newOrderBtn);
 		
-		//button for editing profile    
-		Button editProfileBtn = new Button("Edit Profile");
-        editProfileBtn.setOnAction(e -> BurritoKingApp.showProfile(user));
-        vbox.getChildren().add(editProfileBtn);
         
         //for collection of order
+	    HBox collectOrderBox = new HBox(10);
         Label collectOrderLabel = new Label("Enter Order ID to Collect:");
         TextField collectOrderIDField = new TextField();
         collectOrderIDField.setMaxWidth(100);
@@ -296,7 +426,7 @@ public class Dashboard {
         //for collection of order
         Label collectTimeLabel = new Label("Collection Time (HH:mm) 24hr time");
         TextField collectTimeField = new TextField();
-        collectTimeField.setMaxWidth(200);
+        collectTimeField.setMaxWidth(100);
 			
 		
 		
@@ -359,39 +489,12 @@ public class Dashboard {
 		    }
 		});
 		
-//		 collectOrderBtn.setOnAction(e -> {
-//			 int orderID= Integer.parseInt(collectOrderIDField.getText());
-//			 String collectTimeStr = collectTimeField.getText();
-//			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-//			 
-//			 if (collectTimeStr.isEmpty()) {
-//			        showAlert("Collect Order Error", "Order ID and collection time must be filled out.");
-//			        return;
-//			    }
-//			 
-//			 try {
-//				 LocalDateTime collectTime = LocalDateTime.now().withHour(Integer.parseInt(collectTimeStr.split(":")[0])).withMinute(Integer.parseInt(collectTimeStr.split(":")[1]));
-//				 Order orderToCollect = user.getOrderById(orderID);
-//				 if(orderToCollect != null) {
-//					 LocalDateTime minCollectTime = orderToCollect.getOrderPlacedTime().plusMinutes(UserManager.calculatePreparationTime(orderToCollect));
-//					 if (collectTime.isAfter(minCollectTime) && "placed".equals(orderToCollect.getStatus())) {
-//		                    UserManager.collectOrder(user.getUsername(), orderID, collectTime);
-//		                    BurritoKingApp.showDashboard(user);
-//					 }else {
-//						 System.out.println("Invalid collection time or order has been cancelled");
-//					 }
-//					 
-//				 }else {
-//					 System.out.println("Order not found.");
-//				 }
-//				 
-//				 
-//			 }catch (DateTimeParseException ex) {
-//				 System.out.println("Invalid collection time format.");
-//			 }
-//		 });
-		 vbox.getChildren().addAll(collectOrderLabel, collectOrderIDField, collectTimeLabel, collectTimeField, collectOrderBtn);
-		 
+
+		 collectOrderBox.getChildren().addAll(collectOrderLabel, collectOrderIDField, collectTimeLabel, collectTimeField, collectOrderBtn);
+		 vbox.getChildren().add(collectOrderBox);
+
+		 HBox cancelOrderBox = new HBox(10);
+		 cancelOrderBox.setAlignment(Pos.CENTER_LEFT);
 		 Label cancelOrderLabel = new Label ("Enter Order ID to cancel:");
 		 TextField cancelOrderIDField = new TextField();
 		 cancelOrderIDField.setMaxWidth(100);
@@ -433,7 +536,7 @@ public class Dashboard {
 		 
 
 		 
-		    vbox.getChildren().addAll(cancelOrderLabel, cancelOrderIDField, cancelOrderBtn);
+		 cancelOrderBox.getChildren().addAll(cancelOrderLabel, cancelOrderIDField, cancelOrderBtn);
 		    
 		    //button to export the orders
 		    Button exportOrdersBtn = new Button("Export Orders");
@@ -500,6 +603,77 @@ public class Dashboard {
 
 		    vbox.getChildren().add(exportOrdersBtn);
 		    
+		    
+		    
+		    
+		    
+		    /////////////////////////////////////////////// vip stuff
+		   
+		    
+		    
+//		    Button upgradeToVIPBtn = new Button("Upgrade to VIP");
+//		    upgradeToVIPBtn.setOnAction(e -> {
+//		    	TextField emailField = new TextField();
+//		    	emailField.setPromptText("Enter Email");
+//		    	
+//		    	Button confirmUpgradeBtn = new Button ("Upgrade");
+//		    	confirmUpgradeBtn.setOnAction(ev -> {
+//		    		String email = emailField.getText();
+//		    		if(email.isEmpty()) {
+//		    			showAlert("Upgrade Error", "Please enter a valid email address.");
+//		    		}else {
+//		    			boolean upgraded = UserManager.upgradeToVIP(user.getUsername(), email);
+//		    			if(upgraded) {
+//		    				showAlert("Upgrade Sucessful", "You are now a VIP!!");
+//		    			}else {
+//		    				showAlert("Upgrade error", "You are either already a VIP or the email is invalid.");
+//		    			}
+//		    		}
+//		    	});
+//		    	
+//		    	VBox upgradeBox = new VBox(10, emailField, confirmUpgradeBtn);
+//		    	upgradeBox.setAlignment(Pos.CENTER);
+//		    	upgradeBox.setPadding(new Insets(10));
+//		    	Scene upgradeScene = new Scene(upgradeBox, 300, 200);
+//		    	Stage upgradeStage = new Stage();
+//		    	upgradeStage.setTitle("Upgrade To VIP");
+//		    	upgradeStage.setScene(upgradeScene);
+//		    	upgradeStage.show();
+//		    });
+//		    vbox.getChildren().add(upgradeToVIPBtn);
+//		    
+//		    Button useCreditsBtn = new Button("Use Credits for Order");
+//	        useCreditsBtn.setOnAction(e -> {
+//	            TextField creditsField = new TextField();
+//	            creditsField.setPromptText("Enter credits");
+//	            Button confirmUseCreditsBtn = new Button("Use");
+//	            confirmUseCreditsBtn.setOnAction(ev -> {
+//	                try {
+//	                    int credits = Integer.parseInt(creditsField.getText());
+//	                    boolean success = UserManager.useCredits(user.getUsername(), credits);
+//	                    if (success) {
+//	                        showAlert("Credits Used", credits + " credits have been used for your order.");
+//	                    } else {
+//	                        showAlert("Credits Error", "You do not have enough credits.");
+//	                    }
+//	                } catch (NumberFormatException ex) {
+//	                    showAlert("Input Error", "Please enter a valid number.");
+//	                }
+//	            });
+//
+//	            VBox creditsBox = new VBox(10, creditsField, confirmUseCreditsBtn);
+//	            creditsBox.setAlignment(Pos.CENTER);
+//	            creditsBox.setPadding(new Insets(10));
+//	            Scene creditsScene = new Scene(creditsBox, 200, 150);
+//	            Stage creditsStage = new Stage();
+//	            creditsStage.setTitle("Use Credits");
+//	            creditsStage.setScene(creditsScene);
+//	            creditsStage.show();
+//	        });
+//	        vbox.getChildren().add(useCreditsBtn);
+	        
+	        ////////////////////////////////////////////// vip stuff
+
 		    //button to logout
 		    //clears the session and takes user back to login screen
 		    Button logoutBtn = new Button("Log Out");
@@ -513,7 +687,46 @@ public class Dashboard {
 		    return vbox;
 		}
 	 
-	 
+	private static VBox createOrdersDisplay(User user) { /// I dont need this method
+		 VBox vbox = new VBox(10);
+		    vbox.setPadding(new Insets(20, 0, 20, 0));
+		    vbox.setAlignment(Pos.CENTER);
+
+		    Label ordersLabel = new Label("Your Orders:");
+		    ListView<Order> ordersListView = new ListView<>();
+		    ObservableList<Order> ordersList = FXCollections.observableArrayList(user.getOrders());
+		    
+		    //I dont think this is needed now that i fixed the date issue 
+		    LocalDateTime fallbackDate = LocalDateTime.now();
+		    for (Order order : ordersList) {
+		        if (order.getOrderPlacedTime() == null) {
+		            order.setOrderPlacedTime(fallbackDate);//////////////////////////////////////////////////////////////////Remove maybe???
+		        }
+		    }
+
+		    ordersList.sort(Comparator.comparing(Order::getOrderPlacedTime, Comparator.nullsLast(Comparator.reverseOrder())));
+		    
+		    //sets the orders sorted in the Listview
+		    ordersListView.setItems(ordersList);
+		    ordersListView.setCellFactory(param -> new ListCell<Order>() {
+		        @Override
+		        protected void updateItem(Order order, boolean empty) {
+		            super.updateItem(order, empty);
+		            if (empty || order == null) {
+		                setText(null);
+		            } else {
+		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");/////////////////////// need to change the format now!
+		                String formattedPlacedTime = order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().format(formatter) : "N/A";
+		                String formattedCollectedTime = order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().format(formatter) : "N/A";
+		                setText(String.format("Order ID: %d\nStatus: %s\nPlaced Time: %s\nCollected Time: %s\nTotal Price: $%.2f\nItems: %d", 
+		                        order.getOrderID(), order.getStatus(), formattedPlacedTime, formattedCollectedTime, order.calculateTotal(), order.getItems().size()));
+		            }
+		        }
+		    });
+		    vbox.getChildren().addAll(ordersLabel, ordersListView);
+
+		    return vbox;
+	    }
 	 
 	 //used to hold the basket controls
 	private static HBox createBasketControls(ListView<KingItem> basketListView) {
@@ -579,46 +792,7 @@ public class Dashboard {
 	 
 	 
 	 //here is where the ive created a display for the users orders. 
-	 private static VBox createOrdersDisplay(User user) {
-		 VBox vbox = new VBox(10);
-		    vbox.setPadding(new Insets(20, 0, 20, 0));
-		    vbox.setAlignment(Pos.CENTER);
-
-		    Label ordersLabel = new Label("Your Orders:");
-		    ListView<Order> ordersListView = new ListView<>();
-		    ObservableList<Order> ordersList = FXCollections.observableArrayList(user.getOrders());
-		    
-		    //I dont think this is needed now that i fixed the date issue 
-		    LocalDateTime fallbackDate = LocalDateTime.now();
-		    for (Order order : ordersList) {
-		        if (order.getOrderPlacedTime() == null) {
-		            order.setOrderPlacedTime(fallbackDate);//////////////////////////////////////////////////////////////////Remove maybe???
-		        }
-		    }
-
-		    ordersList.sort(Comparator.comparing(Order::getOrderPlacedTime, Comparator.nullsLast(Comparator.reverseOrder())));
-		    
-		    //sets the orders sorted in the Listview
-		    ordersListView.setItems(ordersList);
-		    ordersListView.setCellFactory(param -> new ListCell<Order>() {
-		        @Override
-		        protected void updateItem(Order order, boolean empty) {
-		            super.updateItem(order, empty);
-		            if (empty || order == null) {
-		                setText(null);
-		            } else {
-		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");/////////////////////// need to change the format now!
-		                String formattedPlacedTime = order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().format(formatter) : "N/A";
-		                String formattedCollectedTime = order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().format(formatter) : "N/A";
-		                setText(String.format("Order ID: %d\nStatus: %s\nPlaced Time: %s\nCollected Time: %s\nTotal Price: $%.2f\nItems: %d", 
-		                        order.getOrderID(), order.getStatus(), formattedPlacedTime, formattedCollectedTime, order.calculateTotal(), order.getItems().size()));
-		            }
-		        }
-		    });
-		    vbox.getChildren().addAll(ordersLabel, ordersListView);
-
-		    return vbox;
-	    }
+	 
 
 
 }

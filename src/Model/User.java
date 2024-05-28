@@ -17,6 +17,11 @@ public class User {
 	
 	private Order currentOrder;
 	
+	
+	private boolean isVIP;
+	private int credits;
+	private String email;
+	
 	//constructor used to initialise a new user with the details added
 	public User(String username, String password, String firstName, String lastName) {
 		this.username = username;
@@ -24,6 +29,9 @@ public class User {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.orders = new ArrayList<>();
+		
+		this.isVIP = false;
+		this.credits = 0;
 	}
 	
 	
@@ -85,6 +93,59 @@ public class User {
 	public void addOrder(Order order) {
 		this.orders.add(order);
 	}
+	
+	/////////////////////////////// vip stuff
+	public int getCredits() {
+		return credits;
+	}
+	
+	public void setCredits(int credits) {
+        this.credits = credits;
+    }
+	
+	public boolean isVIP() {
+		return isVIP;
+	}
+	
+	public void setVIP(boolean isVIP) {
+        this.isVIP = isVIP;
+    }
+	
+	public String getEmail() {
+		return email;
+	}
+	
+	public void setEmail(String email) {
+        this.email = email;
+    }
+	
+	public void upgradeToVIP(String email) {
+		this.isVIP = true;
+		this.email = email;
+
+	}
+	public void addCredits(int credits) {
+		this.credits += credits;
+	}
+	
+	
+	
+	public void deductCredits(int credits) {
+	    if (this.credits >= credits) {
+	        this.credits -= credits;
+	    }
+	}
+	
+	public boolean useCredits(int credits) {
+		if (this.credits >= credits) {
+			this.credits -= credits;
+			return true;
+		}
+		return false;
+	}
+	////////////////////////////////////////vip stuff
+	
+	
 	
 	//method used to get an order by its ID
 	public Order getOrderById(int orderId) {
