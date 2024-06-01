@@ -4,10 +4,14 @@
 //
 package Model;
 
+import java.io.Serializable;
+
 import Interface.KingItem;
 
 //this class is for meals and has the discount applied
-public class Meal implements KingItem {
+public class Meal implements KingItem, Serializable {
+	private static final long serialVersionUID  = 1L;
+	
 	 private static final double DISCOUNT = 3.0;
 	    private double price;
 

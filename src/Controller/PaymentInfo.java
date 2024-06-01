@@ -33,18 +33,7 @@ public class PaymentInfo {
         }
     }
 	
-	
-//	public static boolean validateExpiryDate(String expiryDate) {
-//		DateTimeFormatter formatter =DateTimeFormatter.ofPattern("MM/yy");
-//		try {
-//			LocalDate expiry = LocalDate.parse(expiryDate + "-01", DateTimeFormatter.ofPattern("MM/yy-dd"));
-//			return expiry.isAfter(LocalDate.now());
-//		}catch (DateTimeParseException e) {
-//			return false;
-//		}
-//	}
-	
-	
+
 	//this method was made to check the cvv
 	//made sure that its a digit and 3 digits long. 
 	public static boolean validateCVV(String cvv) {

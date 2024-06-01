@@ -1,4 +1,5 @@
 package View;
+import Controller.UserManager;
 import Model.User;
 import View.OrderOnDashBoard;
 import javafx.application.Application;
@@ -10,7 +11,7 @@ import javafx.scene.layout.GridPane;
 
 
 //starting point of the program
-public class BurritoKingApp extends Application{
+public class BurritoKingApp extends Application{//honestly dont like the name of the class, might change. Maybe just BurritoKing?
 	
 	//static variable to hold the primary stage application
 	//when i tried to use primary stage instead of a variable to hold it
@@ -20,6 +21,9 @@ public class BurritoKingApp extends Application{
 	//start method is the entry point of the javafx
 	@Override
 	public void start (Stage primaryStage) {
+//		UserManager.loadUsersFromFile();//skeleton loss
+		UserManager userManager = UserManager.getInstance();//skelton
+        userManager.loadUsersFromFile();//skelton
 		
 		//as mentioned earlier setting primaryStage to startingStage
 		//here ive set the title, i display the login form and making it visable.
@@ -67,7 +71,7 @@ public class BurritoKingApp extends Application{
 	//displays the order on the dashboard
 	public static void showOrderOnDashBoard(User user) {
 		startingStage.setTitle("Burrito King Restaurant - Place Order");
-		Scene scene = new Scene(OrderOnDashBoard.createOrderPlacement(user), 800, 800);
+		Scene scene = new Scene(OrderOnDashBoard.createOrderPlacement(user), 800, 800);//might change the create name as maybe changing class name?
 		startingStage.setScene(scene);
 	}
 	
@@ -80,3 +84,5 @@ public class BurritoKingApp extends Application{
 	}
 
 }
+
+

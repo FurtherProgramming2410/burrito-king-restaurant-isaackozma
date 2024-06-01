@@ -5,9 +5,12 @@
 package Model;
 
 
+import java.io.Serializable;
+
 import Interface.KingItem;
 
-public class FoodItem implements KingItem{
+public class FoodItem implements KingItem, Serializable{
+	private static final long serialVersionUID = 1L;
 	 private String name;
 	 private double price;
 	 private int quantity;
@@ -30,7 +33,7 @@ public class FoodItem implements KingItem{
 	    }
 	    
 	    //getter method for name
-	    public String getName() {
+	    public String getName() {//this confuses me lol double check this
 	        return name;
 	    }
 	    

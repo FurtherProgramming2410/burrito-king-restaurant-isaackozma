@@ -1,11 +1,13 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 //user class is used to represent the user. 
 //stores their details and orders.
-public class User {
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	//here i store all the users data 
 	//pretty simple just first & last name, username, password, orders.
@@ -89,6 +91,10 @@ public class User {
 		return orders;
 	}
 	
+	public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+	
 	//adds order to the list from a user
 	public void addOrder(Order order) {
 		this.orders.add(order);
@@ -150,7 +156,7 @@ public class User {
 	//method used to get an order by its ID
 	public Order getOrderById(int orderId) {
 		for (Order order : orders) {
-			if (order.getOrderID() == orderId) {
+			if (order.getOrderID() == orderId) {/// this is confusing, it works but maybe change, leave to end as its not needed, to many orders lol 
 				return order;
 			}
 		}
@@ -158,3 +164,5 @@ public class User {
 	}
 
 }
+
+

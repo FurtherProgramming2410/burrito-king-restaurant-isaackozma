@@ -1,4 +1,5 @@
 package Model;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -10,10 +11,11 @@ import Interface.KingItem;
 
 
 //in this class is where the order process is
-public class Order {
+public class Order implements Serializable {
 	
 	//changed from my original A1 submission to handle the interface and meals
 	//holds objects of kingitem.
+	private static final long serialVersionUID = 1L;
     private List<KingItem> items = new ArrayList<>();
     private int orderID;
     private String status;
@@ -55,7 +57,7 @@ public class Order {
 
     //generates a number for the ID
     private int generateOrderID() {
-        return new Random().nextInt(1000);
+        return new Random().nextInt(1000);// explain why 1000 was the limit, makes sense?
     }
     
     
@@ -74,24 +76,11 @@ public class Order {
     //calculates the cost of the order then subtracts the amount paid
     //will be able to tell if its enough and then give change if needed.
     //also added and else which will tell the user if the amount given is not enough.
-//    public double processPayment(double amountPaid, int creditsToUse) {//might change name to make moresense also credits to use was added!!
-//        double total = calculateTotal();
-//        double creditValue = creditsToUse / 100.0; //Added for VIP
-//        double finalTotal = total - creditValue;//// added for VIP
-//        double change = amountPaid - finalTotal; /// was double change = amountPaid - total;
-//        
-//        
-//        if (change >= 0) {
-//        	this.actualPaidAmount = total; ////////////check this, may fail, added for VIP
-//            return change;
-//        } else {
-//            return -1; 
-//        }
-//    }
+
     
     public double processPayment(double amountPaid, int creditsUsed) {// added credits as well ,need to test to see if it works correctly
         double total = calculateTotal();
-        double creditValue = creditsUsed / 100.0;
+        double creditValue = creditsUsed / 100.0;//once finalised credit system, change from value, maybe credit amount, check with userManager so i dont get confused
         double finalTotal = total - creditValue;
         double change = amountPaid - finalTotal;
         if (change >= 0) {
@@ -168,6 +157,4 @@ public class Order {
                "\nItems: " + items.size();
     }
 }
-    
-    
 

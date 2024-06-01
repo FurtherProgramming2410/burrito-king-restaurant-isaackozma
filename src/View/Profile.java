@@ -39,6 +39,9 @@ public class Profile {
         pane.add(passwordField, 1, 2);
         
         
+        UserManager userManager = UserManager.getInstance();
+        
+        
         //here I make a save button for the changes
         //takes the info added and updates it in usermanager class.
         //user is then taken back to the dashboard. 
@@ -47,7 +50,9 @@ public class Profile {
         	user.setFirstName(firstNameField.getText());
         	user.setLastName(lastNameField.getText());
         	user.setPassword(passwordField.getText());
-        	UserManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText());
+//        	UserManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText()); // orginal before skeloton
+        	
+        	userManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText()); // change with skeleton 
         	BurritoKingApp.showDashboard(user);
         });
         

@@ -7,5 +7,5 @@ package Interface;
 public interface KingItem {
 	double getPrice();
 	String getName();
-
+	
 }

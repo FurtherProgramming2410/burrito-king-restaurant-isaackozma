@@ -24,7 +24,7 @@ public class Registration {
 		pane.setHgap(10);
 		pane.setVgap(10);
 		pane.setPadding(new Insets(25, 25, 25, 25));
-		pane.getStyleClass().add("grid-pane");
+		pane.getStyleClass().add("grid-pane");// do i still need this?? I think this was from an early version?
 		
 		//Here i created a label for the user for the username
 		//i also positioned it
@@ -83,8 +83,13 @@ public class Registration {
 				 showAlert1("Registration Error", "All fields must be filled out.");
 			        return;
 			    }
+			 
+			 
+			 UserManager userManager = UserManager.getInstance();//skeleton
+			 
 			//boolean is used to register the user, checks if it is unique
-			boolean registered = UserManager.registerUser(username, password, firstName, lastName);
+//			boolean registered = UserManager.registerUser(username, password, firstName, lastName);//loss skeleton 
+			 boolean registered = userManager.registerUser(username, password, firstName, lastName);//skeleton
 		
 			//if the registration is ok then it will direct the user to the login area
 			if(registered ) {

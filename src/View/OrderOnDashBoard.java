@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import Controller.PaymentInfo;
 import Controller.UserManager;
@@ -27,20 +28,16 @@ import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
 
 //This class is used for the layout and functionality for placing an order on the dahsboard
+
 public class OrderOnDashBoard {
-	
-	
-	
-	//Creates the layout
-	//creates the buttons and labels for all
-	public static GridPane createOrderPlacement(User user) {
-		GridPane pane = new GridPane();
+    public static GridPane createOrderPlacement(User user) {
+        GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(25, 25, 25, 25));
 
-        Label cardNumberLabel = new Label("Please enter a fake Credit Card Number:");
+        Label cardNumberLabel = new Label("Please enter a fake Credit Card Number(16 numbers):");
         TextField cardNumberField = new TextField();
         cardNumberField.setMaxWidth(150);
 
@@ -48,21 +45,21 @@ public class OrderOnDashBoard {
         TextField expiryDateField = new TextField();
         expiryDateField.setMaxWidth(50);
 
-        Label cvvLabel = new Label("CVV:");
+        Label cvvLabel = new Label("CVV (3 Numbers):");
         TextField cvvField = new TextField();
         cvvField.setMaxWidth(50);
 
         Label fakeTimeLabel = new Label("Fake Time (HH:mm):");
         TextField fakeTimeField = new TextField();
         fakeTimeField.setMaxWidth(100);
-        
-        Label creditsLabel = new Label("Credits to use:"); ////////////////// vip
+
+        Label creditsLabel = new Label("Credits to use (enter 0 if none):");
         TextField creditField = new TextField();
         creditField.setMaxWidth(100);
-        
-        if(!user.isVIP()) {
-        	creditsLabel.setVisible(false);
-        	creditField.setVisible(false);
+
+        if (!user.isVIP()) {
+            creditsLabel.setVisible(false);
+            creditField.setVisible(false);
         }
 
         Button placeOrderBtn = new Button("Place Order");
@@ -71,27 +68,23 @@ public class OrderOnDashBoard {
             String expiryDate = expiryDateField.getText();
             String cvv = cvvField.getText();
             String fakeTimeStr = fakeTimeField.getText();
-            String creditsStr = user.isVIP() ? creditField.getText() : "0";//////////////////// vip
+            String creditsStr = user.isVIP() ? creditField.getText() : "0";
 
-            //checks to see if any of the fields are empy
-            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || (user.isVIP() && creditsStr.isEmpty())) {// added credit stuff here for vip
+            if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || (user.isVIP() && creditsStr.isEmpty())) {
                 showAlert("Order Error", "All fields must be filled out.");
                 return;
             }
 
-            
             try {
-            	//parse the fake time input
-                String[] timeParts = fakeTimeStr.split(":");
-                if (timeParts.length != 2) {
+                String[] timeSplit = fakeTimeStr.split(":");
+                if (timeSplit.length != 2) {
                     throw new DateTimeParseException("Invalid time format", fakeTimeStr, 0);
                 }
 
-                int hour = Integer.parseInt(timeParts[0]);
-                int minute = Integer.parseInt(timeParts[1]);
+                int hour = Integer.parseInt(timeSplit[0]);
+                int minute = Integer.parseInt(timeSplit[1]);
                 LocalDateTime fakeTime = LocalDateTime.now().withHour(hour).withMinute(minute);
 
-                //gets the info from the temp order from the dahsboard.
                 Order tempOrder = Dashboard.getTempOrder();
                 System.out.println("Placing order ID: " + tempOrder.getOrderID() + " with items: " + tempOrder.getItems().size());
 
@@ -99,35 +92,37 @@ public class OrderOnDashBoard {
                     System.out.println("Item: " + item.getName() + " Price: " + item.getPrice());
                 }
 
-
-                
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
                     int credits = Integer.parseInt(creditsStr);
+                    UserManager userManager = UserManager.getInstance();//added skeleton
                     if (user.isVIP() && credits > 0) {
-                        boolean success = UserManager.useCredits(user.getUsername(), credits);
+//                        boolean success = UserManager.useCredits(user.getUsername(), credits);
+                        boolean success = userManager.useCredits(user.getUsername(), credits);// added skelton
                         if (!success) {
                             showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
                             return;
                         }
                     }
-//                    boolean success = UserManager.useCredits(user.getUsername(), credits);
-//                    if (success) {
-                        UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, user.isVIP() ? Integer.parseInt(creditsStr) : 0);
-                        System.out.println("Order placed: " + tempOrder);
-                        int preparationTime = UserManager.calculatePreparationTime(tempOrder);
-                        showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
-                        Dashboard.clearTempOrder();
-                        BurritoKingApp.showDashboard(user);
-                    } else {
-                        showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
-                    }
-//                } else {
-//                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
-//                }
+
+//                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // loss skeleton
+                    userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // added skeleton
+                    System.out.println("Order placed: " + tempOrder);
+
+//                    UserManager.saveOrdersToFile(); // loss skeleton 
+                    userManager.saveOrdersToFile();// addded skelton
+                    System.out.println("Order placed and saved successfully!");
+
+//                    int preparationTime = UserManager.calculatePreparationTime(tempOrder); // loss skeleton
+                    int preparationTime = userManager.calculatePreparationTime(tempOrder);// added skelton 
+                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
+                    Dashboard.clearTempOrder();
+                    BurritoKingApp.showDashboard(user);
+                } else {
+                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
+                }
             } catch (NumberFormatException | DateTimeParseException ex) {
                 showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
             }
-                
         });
 
         pane.add(cardNumberLabel, 0, 0);
@@ -143,10 +138,10 @@ public class OrderOnDashBoard {
         pane.add(placeOrderBtn, 1, 5);
         return pane;
     }
-	
-	
+
+
 	//
-	private static void itemsBeingOrdered(Order order, String itemName, int quantity) {
+	private static void itemsBeingOrdered(Order order, String itemName, int quantity) {///// this even being used anymore?
 		for(int i = 0; i < quantity; i++) {
 			switch(itemName) {
 			case "Burrito":
@@ -168,7 +163,7 @@ public class OrderOnDashBoard {
 	    }
 
 	
-	private static LocalDateTime parseFakeTime(String fakeTime) {
+	private static LocalDateTime parseFakeTime(String fakeTime) {/// yeah nah probably change this.
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 			LocalTime time = LocalTime.parse(fakeTime, formatter);

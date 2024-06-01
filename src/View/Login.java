@@ -49,6 +49,8 @@ public class Login {
 		Button btnLogin = new Button ("Sign in");
 		
 		
+		UserManager userManager = UserManager.getInstance();// for skeleton stuff!!!!!!!!!!!!
+		
 		//here is an action statement that is triggered when the button is pressed
 		//gets the text from the user name and password.
 		btnLogin.setOnAction(event -> {
@@ -64,7 +66,10 @@ public class Login {
 			
 			//this will try to log in the user
 			//if the entry is correct then the user will be taken to the dashboard
-			User user = UserManager.loginUser(username, password);
+			
+            User user = userManager.loginUser(username, password);
+			
+//			User user = UserManager.loginUser(username, password); // was the orginal before change!!!!!!!!!!!!!!!!
 			if (user != null) {
 				BurritoKingApp.showDashboard(user);
 				
