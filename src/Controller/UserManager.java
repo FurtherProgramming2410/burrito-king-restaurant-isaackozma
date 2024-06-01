@@ -23,6 +23,7 @@ import Interface.KingItem;
 import Model.Meal;
 import Model.Order;
 import Model.User;
+import util.Alerts;
 
 
 //this class is responsible for managing user data and operations.
@@ -138,7 +139,8 @@ public class UserManager {
 	        if (order != null && "placed".equals(order.getStatus()) && isValidCollectionTime(order, collectTime)) {
 	            order.setStatus("collected");
 	            order.setOrderCollectedTime(collectTime);
-	            System.out.println("Order " + orderID + " collected.");
+	            Alerts.infoMessage("Orders Collected", "Order " + orderID + " collected.");
+//	            System.out.println("Order " + orderID + " collected.");
 	            saveOrdersToFile(); 
 	        } else {
 	            System.out.println("Invalid time to collect or order has been cancelled.");
@@ -234,16 +236,27 @@ public class UserManager {
                 double totalAmount = order.calculateTotal();
                 double finalAmount = totalAmount;
 
-                if (user.isVIP()) {
-                    finalAmount = totalAmount - (creditsUsed / 100.0);
-                    user.addCredits((int) finalAmount);
+//                if (user.isVIP()) {
+//                    finalAmount = totalAmount - (creditsUsed / 100.0);
+//                    user.addCredits((int) finalAmount);
+//                    user.setCredits(user.getCredits() - creditsUsed);
+//                }
+                
+                if (user.isVIP() && creditsUsed > 0) {// trying to fix credit system with this if
+                    finalAmount -= (creditsUsed / 100.0);
                     user.setCredits(user.getCredits() - creditsUsed);
                 }
 
                 order.setTotalAmount(finalAmount);
                 user.addOrder(order);
                 System.out.println("Order placed successfully for user: " + username + ". Order ID: " + order.getOrderID());
-                saveOrdersToFile(); 
+                
+                
+                int creditsEarned = (int) finalAmount;//these two added for credits
+                user.addCredits(creditsEarned);
+                
+                saveOrdersToFile();
+                saveUsersToFile();// added for credits
             }
         } else {
             System.out.println("Invalid payment details provided.");
@@ -262,6 +275,7 @@ public class UserManager {
         if (user != null && email != null && !email.trim().isEmpty()) {//// might have to change this when changing requirments for email?
             user.setVIP(true);
             user.setEmail(email);
+            saveUsersToFile();////// works, saves users a vip if application is closed
             return true;
         }
         return false;
@@ -303,7 +317,8 @@ public class UserManager {
 //	public static void logoutUser() {
     public void logoutUser() {
         currentUser = null;
-        System.out.println("User logged out.");// change to an alert
+        Alerts.infoMessage("Logged out", "User logged out.");
+//        System.out.println("User logged out.");// change to an alert
     }
 
 	
@@ -317,7 +332,8 @@ public class UserManager {
 	        user.setFirstName(firstName);
 	        user.setLastName(lastName);
 	        user.setPassword(password);
-	        saveUsersToFile(); 
+	        saveUsersToFile();
+	        Alerts.infoMessage("Successful update", "Profile updated and saved for user: " + username);
 	        System.out.println("Profile updated and saved for user: " + username);//change to alert
 	        return true;
 	    }
@@ -367,6 +383,7 @@ public class UserManager {
 							bufferedWriter.write(String.join(",", csvValues));
 							bufferedWriter.newLine();
 						}
+						Alerts.infoMessage("Export success", "Orders exported successfully to " + filePath);
 						System.out.println("Orders exported successfully to " + filePath);
 				} catch (IOException e) {
 					System.out.println("Failed to export orders: " + e.getMessage());

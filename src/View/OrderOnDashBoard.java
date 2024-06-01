@@ -26,6 +26,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
+import util.Alerts;
 
 //This class is used for the layout and functionality for placing an order on the dahsboard
 
@@ -71,7 +72,7 @@ public class OrderOnDashBoard {
             String creditsStr = user.isVIP() ? creditField.getText() : "0";
 
             if (cardNumber.isEmpty() || expiryDate.isEmpty() || cvv.isEmpty() || fakeTimeStr.isEmpty() || (user.isVIP() && creditsStr.isEmpty())) {
-                showAlert("Order Error", "All fields must be filled out.");
+            	Alerts.errorMessage("Order Error", "All fields must be filled out.");
                 return;
             }
 
@@ -94,34 +95,44 @@ public class OrderOnDashBoard {
 
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
                     int credits = Integer.parseInt(creditsStr);
-                    UserManager userManager = UserManager.getInstance();//added skeleton
+//                    UserManager userManager = UserManager.getInstance();//added skeleton// changed for credits
                     if (user.isVIP() && credits > 0) {
 //                        boolean success = UserManager.useCredits(user.getUsername(), credits);
-                        boolean success = userManager.useCredits(user.getUsername(), credits);// added skelton
+                    	
+//                        boolean success = userManager.useCredits(user.getUsername(), credits);// added skelton
+                    	boolean success = UserManager.getInstance().useCredits(user.getUsername(), credits);// changed for credits
                         if (!success) {
-                            showAlert("Order Error", "Failed to use credits. Please check your credits balance.");
+                        	Alerts.errorMessage("Order Error", "Failed to use credits. Please check your credits balance.");
                             return;
                         }
                     }
+                    
 
 //                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // loss skeleton
-                    userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // added skeleton
+                    
+//                    userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // added skeleton
+                    UserManager.getInstance().placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);// changed for credits
                     System.out.println("Order placed: " + tempOrder);
 
 //                    UserManager.saveOrdersToFile(); // loss skeleton 
-                    userManager.saveOrdersToFile();// addded skelton
+                    
+                    
+//                    userManager.saveOrdersToFile();// addded skelton
+                    UserManager.getInstance().saveOrdersToFile();//changed for credits
                     System.out.println("Order placed and saved successfully!");
 
 //                    int preparationTime = UserManager.calculatePreparationTime(tempOrder); // loss skeleton
-                    int preparationTime = userManager.calculatePreparationTime(tempOrder);// added skelton 
-                    showAlert("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes.");
+//                    int preparationTime = userManager.calculatePreparationTime(tempOrder);// added skelton 
+                    int preparationTime = UserManager.getInstance().calculatePreparationTime(tempOrder);// changed for credits
+                    Alerts.infoMessage("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes. "
+                    		+ "\n" + tempOrder);
                     Dashboard.clearTempOrder();
                     BurritoKingApp.showDashboard(user);
                 } else {
-                    showAlert("Order Error", "Invalid payment details. Please check your inputs and try again.");
+                    Alerts.errorMessage("Order Error", "Invalid payment details. Please check your inputs and try again.");
                 }
             } catch (NumberFormatException | DateTimeParseException ex) {
-                showAlert("Order Error", "Invalid fake time format. Please enter the time in HH:mm format.");
+            	Alerts.errorMessage("Order Error", "Invalid fake time format. Please enter the time in HH:MM format.");
             }
         });
 
@@ -174,22 +185,6 @@ public class OrderOnDashBoard {
 	}
 	
 	
-	//shown when thers an error
-	private static void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 	
-	//shown when the user is furthing their progress
-	private static void showAlert1(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
 }

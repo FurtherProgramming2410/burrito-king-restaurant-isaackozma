@@ -35,6 +35,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import util.Alerts;
 
 // this class is for the dashboard that is displayed after login. 
 
@@ -103,7 +104,9 @@ public class Dashboard {
         });
 	    
 	    Button upgradeToVIPBtn = new Button("Upgrade to VIP");
-        upgradeToVIPBtn.setOnAction(e -> emailForVIP(user));
+//        upgradeToVIPBtn.setOnAction(e -> emailForVIP(user));
+	    upgradeToVIPBtn.setOnAction(e -> handleUpgradeToVIP(user));
+        
 
 
         pane.add(upgradeToVIPBtn,  2,1);
@@ -155,7 +158,8 @@ public class Dashboard {
 	            System.out.println("Placing new order for user: " + user.getUsername());//get rid of logging statments 
 	            BurritoKingApp.showOrderOnDashBoard(user);
 	        } else {
-	            System.out.println("Add items to your basket before placing an order.");
+	        	Alerts.errorMessage("Add Items", "Add items to your basket before paying.");
+//	            System.out.println("Add items to your basket before placing an order.");
 	        }
 	    });
         HBox payForOrderBox = new HBox();
@@ -175,6 +179,16 @@ public class Dashboard {
 	   
 		
 	}
+	
+	
+	private static void handleUpgradeToVIP(User user) {
+        if (user.isVIP()) {
+        	Alerts.infoMessage("VIP Status", "You are already a VIP!");
+        } else {
+            emailForVIP(user);
+        }
+    }
+	
 	
 
 	private static void emailForVIP(User user) {
@@ -201,10 +215,10 @@ public class Dashboard {
 //            if (UserManager.upgradeToVIP(user.getUsername(), email)) {///// orginal before skeleton 
             UserManager userManager = UserManager.getInstance();
             if (userManager.upgradeToVIP(user.getUsername(), email)) {
-                showAlert("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features");
+            	Alerts.infoMessage("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features");
                 stage.close();
             } else {
-                showAlert("Error", "Failed to upgrade to VIP. Please enter a valid email.");
+            	Alerts.errorMessage("Error", "Failed to upgrade to VIP. Please enter a valid email.");
             }
         });
         pane.add(confirmBtn, 0, 2, 2, 1);
@@ -226,7 +240,8 @@ public class Dashboard {
 	        clearTempOrder();
 	        BurritoKingApp.showDashboard(user);
 	    } else {
-	        System.out.println("Add items to your basket before placing an order.");
+	    	Alerts.errorMessage("Add Items", "Add items to your basket before placing an order.");
+//	        System.out.println("Add items to your basket before placing an order.");
 	    }
 	}
 	
@@ -252,9 +267,10 @@ public class Dashboard {
 	                    break;
 	            }
 	        }
+	        
 	        System.out.println("Added " + quantity + " " + itemName + "(s) to order ID: " + order.getOrderID());//change to alert
 	    } catch (NumberFormatException e) {
-	        showAlert("Input Error", "Please enter a valid number for the quantity.");
+	    	Alerts.errorMessage("Input Error", "Please enter a valid number for the quantity.");
 	    }
 	}
 
@@ -266,7 +282,7 @@ public class Dashboard {
 	        }
 	        System.out.println("Added " + quantity + " meal(s) to order ID: " + order.getOrderID());
 	    } catch (NumberFormatException e) {
-	        showAlert("Input Error", "Please enter a valid number for the quantity.");
+	    	Alerts.errorMessage("Input Error", "Please enter a valid number for the quantity.");
 	    }
 	}
 	
@@ -306,7 +322,18 @@ public class Dashboard {
 		    
 		    Button addToOrder = new Button("Add to Basket:");
 		    addToOrder.setOnAction(e -> {
-		        addItemsToOrder(tempOrder, "Burrito", burritoQty.getText());
+		    	
+		    	int burritoCount = Integer.parseInt(burritoQty.getText());// these were added for the basket to have an alert... maybe wrong
+		        int friesCount = Integer.parseInt(friesQty.getText());
+		        int sodaCount = Integer.parseInt(sodaQty.getText());
+		        int mealCount = user.isVIP() && finalMealQty != null ? Integer.parseInt(finalMealQty.getText()) : 0;
+
+		        if (burritoCount < 1 && friesCount < 1 && sodaCount < 1 && mealCount < 1) {
+		            Alerts.errorMessage("Input Error", "Please enter at least one item.");
+		            return;
+		        }
+		        
+		        addItemsToOrder(tempOrder, "Burrito", burritoQty.getText());/// usally this was the starting code!
 		        addItemsToOrder(tempOrder, "Fries", friesQty.getText());
 		        addItemsToOrder(tempOrder, "Soda", sodaQty.getText());
 		        if (user.isVIP() && finalMealQty != null) {
@@ -328,13 +355,7 @@ public class Dashboard {
 		}
 	
 	 //displays that there has been an error at some stage.
-	private static void showAlert(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle(title);
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
+
 	
 	////////////////////new version currently testing!
 	
@@ -386,7 +407,7 @@ public class Dashboard {
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
 	    if (orderIDStr.isEmpty() || collectTimeStr.isEmpty()) {
-	        showAlert("Collect Order Error", "Order ID and collection time must be filled out.");
+	        Alerts.errorMessage("Collect Order Error", "Order ID and collection time must be filled out.");
 	        return;
 	    }
 
@@ -410,13 +431,13 @@ public class Dashboard {
 	                userManager.collectOrder(user.getUsername(), orderID, collectTime);
 	                BurritoKingApp.showDashboard(user);
 	            } else {
-	                showAlert("Collect Order Error", "Invalid collection time or order has been cancelled.");
+	            	Alerts.errorMessage("Collect Order Error", "Invalid collection time or order has been cancelled.");
 	            }
 	        } else {
-	            showAlert("Collect Order Error", "Order not found.");
+	        	Alerts.errorMessage("Collect Order Error", "Order not found.");
 	        }
 	    } catch (NumberFormatException | DateTimeParseException ex) {
-	        showAlert("Collect Order Error", "Invalid input. Please check the Order ID and time format.");
+	    	Alerts.errorMessage("Collect Order Error", "Invalid input. Please check the Order ID and time format.");
 	    }
 	}
 	
@@ -439,7 +460,7 @@ public class Dashboard {
 	    String orderIDStr = cancelOrderIDField.getText();
 
 	    if (orderIDStr.isEmpty()) {
-	        showAlert("Cancel Order Error", "Order ID must be filled out.");
+	    	Alerts.errorMessage("Cancel Order Error", "Order ID must be filled out.");
 	        return;
 	    }
 
@@ -450,12 +471,12 @@ public class Dashboard {
 	        if (orderToCancel != null && orderToCancel.getStatus().equals("placed")) {
 	            UserManager userManager = UserManager.getInstance();
 	            userManager.cancelOrder(user.getUsername(), orderID);
-	            showAlert("Cancel Order", "Order " + orderID + " has been successfully cancelled.");
+	            Alerts.infoMessage("Cancel Order", "Order " + orderID + " has been successfully cancelled.");
 	        } else {
-	            showAlert("Cancel Order Error", "Order cannot be cancelled or does not exist.");
+	            Alerts.errorMessage("Cancel Order Error", "Order cannot be cancelled or does not exist.");
 	        }
 	    } catch (NumberFormatException ex) {
-	        showAlert("Cancel Order Error", "Invalid Order ID format. Please enter a valid number.");
+	    	Alerts.errorMessage("Cancel Order Error", "Invalid Order ID format. Please enter a valid number.");
 	    }
 	}
 	
@@ -824,6 +845,7 @@ public class Dashboard {
 	        	//removes the item from the basket/tempOrder
 	            tempOrder.getItems().remove(selectedItem);
 	            basketItems.remove(selectedItem);
+	            Alerts.infoMessage("Item Removed", "Item has been removed.");
 	        }
 	    });
 	        
@@ -855,9 +877,10 @@ public class Dashboard {
 	                    basketItems.clear();
 	                    basketItems.addAll(tempOrder.getItems());
 	                    quantityStage.close();
+	                    Alerts.infoMessage("Quantity Updated", "Quantity updated.");
 	                });
 	                quantityBox.getChildren().addAll(new Label("Enter new quantity:"), quantityField, confirmBtn);
-	                Scene quantityScene = new Scene(quantityBox, 200, 150);
+	                Scene quantityScene = new Scene(quantityBox, 300, 200);
 	                quantityStage.setScene(quantityScene);
 	                quantityStage.setTitle("Update Quantity");
 	                quantityStage.show();

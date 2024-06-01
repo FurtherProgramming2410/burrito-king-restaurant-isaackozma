@@ -3,6 +3,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import util.Alerts;
 import Controller.UserManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -80,7 +81,7 @@ public class Registration {
 			
 			//here to check if anyting is empty 
 			 if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
-				 showAlert1("Registration Error", "All fields must be filled out.");
+				 Alerts.errorMessage("Registration Error", "All fields must be filled out.");
 			        return;
 			    }
 			 
@@ -93,12 +94,12 @@ public class Registration {
 		
 			//if the registration is ok then it will direct the user to the login area
 			if(registered ) {
-				showAlert("registration Successful", "Account successfully registered");
+				Alerts.infoMessage("registration Successful", "Account successfully registered");
 				BurritoKingApp.showLogin();
 			
 			//if its not unique it will say the attempt was unsucessful.
 			}else {
-				showAlert("Registration error", "Username already exists");
+				Alerts.errorMessage("Registration error", "Username already exists");
 			}
 			});
 			pane.add(btnRegiester, 1, 5);
@@ -106,22 +107,6 @@ public class Registration {
 		return pane;
 	}
 	
-	//used to let the user know theyve the account was successfull
-	private static void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-	}
 	
-	//used when something has gone wrong.
-	private static void showAlert1(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-	}
 
 }

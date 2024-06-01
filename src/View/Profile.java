@@ -3,12 +3,14 @@ package View;
 import Controller.UserManager;
 import Model.User;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
+import util.Alerts;
 
 //this class is just so the user can edit their profile
 public class Profile {
@@ -47,6 +49,12 @@ public class Profile {
         //user is then taken back to the dashboard. 
         Button saveBtn = new Button("Save");
         saveBtn.setOnAction(e ->{
+        	
+        	if (passwordField.getText().isEmpty()) {
+        		Alerts.errorMessage("Update Error", "Password must be filled out. Can be the same or different");
+                return;
+            }
+        	
         	user.setFirstName(firstNameField.getText());
         	user.setLastName(lastNameField.getText());
         	user.setPassword(passwordField.getText());
@@ -59,5 +67,7 @@ public class Profile {
         pane.add(saveBtn, 1, 3);
         return pane;
 	}
+	
+
 
 }

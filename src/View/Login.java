@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import util.Alerts;
 
 public class Login {
 	//here i create the basic layout of the login screen
@@ -59,7 +60,7 @@ public class Login {
 			
 			//checks if either the username or password is empty
 			if (username.isEmpty() || password.isEmpty()) {
-		        showAlert("Login Error", "Username and password cannot be empty.");
+		        Alerts.errorMessage("Login Error", "Username and Password cannot be empty.");
 		        return;
 		    }
 
@@ -75,7 +76,7 @@ public class Login {
 				
 				//otherwise this message will print saying there was an issue with the log in
 			}else {
-				showAlert("Login Error", "Invalid username or password. Please try again.");
+				Alerts.errorMessage("Login Error", "Invalid username or Password. Please try again.");
 			}
 		});
 		pane.add(btnLogin, 1, 4);
@@ -92,13 +93,6 @@ public class Login {
 		
 	}
 	
-	//method used to display alert 
-	private static void showAlert(String title, String message) {
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle(title);
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
+	
 
 }

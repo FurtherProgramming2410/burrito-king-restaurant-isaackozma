@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
+import javafx.stage.WindowEvent;
 
 
 //starting point of the program
@@ -31,6 +32,11 @@ public class BurritoKingApp extends Application{//honestly dont like the name of
 		startingStage.setTitle("Burrito King Restaurant - Login");
 		showLogin();
 		startingStage.show();
+		
+		startingStage.setOnCloseRequest((WindowEvent event) -> {
+	        userManager.saveUsersToFile();// saves vip user is a vip
+	        userManager.saveOrdersToFile();
+	    });
 	}
 	
 	//method for displaying the login screen
