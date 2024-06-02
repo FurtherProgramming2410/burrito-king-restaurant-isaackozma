@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import Controller.UserManager;
 import Interface.KingItem;
@@ -22,7 +23,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -56,6 +59,8 @@ public class Dashboard {
 	        basketItems.clear();
 	    }
     
+	 
+	 private static Label collectingCredits;
     
 	//Here I've made the dahsboard as a GridPane
 	//I've got the layout below as well
@@ -77,6 +82,14 @@ public class Dashboard {
 		//not sure if i will use VBox or HBox at this moment
 		Label displayName = new Label("Burrito King, Welcome: " + user.getFirstName() + " " + user.getLastName());
         pane.add(displayName, 1, 0);
+        
+        collectingCredits = new Label();
+        if (user.isVIP()) {
+        	updateCollectingCredits(user); 
+            HBox creditsBox = new HBox(collectingCredits);
+            creditsBox.setAlignment(Pos.CENTER);
+            pane.add(creditsBox, 1, 1);
+        }
         
         Button viewOrdersBtn = new Button("View your Orders");
         viewOrdersBtn.setOnAction(e -> {
@@ -155,8 +168,9 @@ public class Dashboard {
 	    Button payForOrderBtn = new Button("Pay for Order");
         payForOrderBtn.setOnAction(e -> {
 	        if (!tempOrder.getItems().isEmpty()) {
-	            System.out.println("Placing new order for user: " + user.getUsername());//get rid of logging statments 
-	            BurritoKingApp.showOrderOnDashBoard(user);
+	        	confirmationMessage(user);///
+	            System.out.println("Placing new order for user: " + user.getUsername());
+//	            BurritoKingApp.showOrderOnDashBoard(user);/// these two worked before i added my stuff to show user how much they are paying
 	        } else {
 	        	Alerts.errorMessage("Add Items", "Add items to your basket before paying.");
 //	            System.out.println("Add items to your basket before placing an order.");
@@ -173,6 +187,8 @@ public class Dashboard {
 		VBox actionButtonArea = orderManagementSection(user);
 	    pane.add(actionButtonArea, 0, 7, 2, 1); 
 	    
+	    
+	    
 
 	    return pane;
 	    
@@ -180,6 +196,10 @@ public class Dashboard {
 		
 	}
 	
+	
+	private static void updateCollectingCredits(User user) {
+		collectingCredits.setText("VIP Credits: " + user.getCredits());
+	}
 	
 	private static void handleUpgradeToVIP(User user) {
         if (user.isVIP()) {
@@ -322,7 +342,7 @@ public class Dashboard {
 		    
 		    Button addToOrder = new Button("Add to Basket:");
 		    addToOrder.setOnAction(e -> {
-		    	
+		    	try {
 		    	int burritoCount = Integer.parseInt(burritoQty.getText());// these were added for the basket to have an alert... maybe wrong
 		        int friesCount = Integer.parseInt(friesQty.getText());
 		        int sodaCount = Integer.parseInt(sodaQty.getText());
@@ -347,6 +367,11 @@ public class Dashboard {
 		            System.out.println("Meals: " + finalMealQty.getText());
 		        }
 		        System.out.println("Current tempOrder items: " + tempOrder.getItems().size());
+		    } catch (NumberFormatException ex) {
+		    	Alerts.errorMessage("Input Error", "Please only enter numbers");
+		    }
+		        
+		        
 		    });
 
 		    hbox.getChildren().add(addToOrder);
@@ -357,6 +382,9 @@ public class Dashboard {
 	 //displays that there has been an error at some stage.
 
 	
+	 
+	 
+	 
 	////////////////////new version currently testing!
 	
 	private static VBox orderManagementSection(User user) {
@@ -471,7 +499,7 @@ public class Dashboard {
 	        if (orderToCancel != null && orderToCancel.getStatus().equals("placed")) {
 	            UserManager userManager = UserManager.getInstance();
 	            userManager.cancelOrder(user.getUsername(), orderID);
-	            Alerts.infoMessage("Cancel Order", "Order " + orderID + " has been successfully cancelled.");
+	            Alerts.infoMessage("Cancel Order", "Order" + orderID + " has been successfully cancelled.");
 	        } else {
 	            Alerts.errorMessage("Cancel Order Error", "Order cannot be cancelled or does not exist.");
 	        }
@@ -814,7 +842,7 @@ public class Dashboard {
 		            if (empty || order == null) {
 		                setText(null);
 		            } else {
-		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");/////////////////////// need to change the format now!
+		                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");/////////////////////// need to change the format now!
 		                String formattedPlacedTime = order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().format(formatter) : "N/A";
 		                String formattedCollectedTime = order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().format(formatter) : "N/A";
 		                setText(String.format("Order ID: %d\nStatus: %s\nPlaced Time: %s\nCollected Time: %s\nTotal Price: $%.2f\nItems: %d", 
@@ -827,6 +855,26 @@ public class Dashboard {
 		    return vbox;
 	    }
 	////////////////////////////// need to check if this even works??? 
+	
+	
+	
+	private static void confirmationMessage(User user) {
+        double totalPrice = tempOrder.calculateTotal();
+//        int waitingTime = calculateWaitingTime(tempOrder);
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Order");
+        alert.setHeaderText("Please confirm your order");
+        alert.setContentText(String.format("Total Price: $%.2f\n", totalPrice));
+
+        ButtonType confirmButton = new ButtonType("Confirm");
+        ButtonType cancelButton = new ButtonType("Cancel");
+        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == confirmButton) {
+            BurritoKingApp.showOrderOnDashBoard(user);
+        } 
+    }
 	 
 	 //used to hold the basket controls
 	private static HBox createBasketControls(ListView<KingItem> basketListView) {
@@ -845,7 +893,7 @@ public class Dashboard {
 	        	//removes the item from the basket/tempOrder
 	            tempOrder.getItems().remove(selectedItem);
 	            basketItems.remove(selectedItem);
-	            Alerts.infoMessage("Item Removed", "Item has been removed.");
+	            Alerts.infoMessage("Item Removed", "Item(s) has been removed.");
 	        }
 	    });
 	        

@@ -58,14 +58,16 @@ class OrderTest {
         LocalDateTime now = LocalDateTime.now();
         order.setOrderPlacedTime(now);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");// change now to flipppppppp
+        order.setTotalAmount(order.calculateTotal());
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");// change now to flipppppppp
         String formattedPlacedTime = now.format(formatter);
 
         String expected = "Order ID: " + order.getOrderID() + "\n"
                         + "Status: placed\n"
                         + "Placed Time: " + formattedPlacedTime + "\n"
                         + "Collected Time: N/A\n"
-                        + "Total Price: $7.00\n"
+                        + "Total Price: $7.00\n" 
                         + "Items: 1";
         
         assertEquals(expected, order.toString());

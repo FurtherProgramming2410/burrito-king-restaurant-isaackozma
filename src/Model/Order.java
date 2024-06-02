@@ -146,7 +146,7 @@ public class Order implements Serializable {
     //order could not print accurately without it
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");//need to change format now that it finally works correctly
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");//need to change format now that it finally works correctly
         String formattedPlacedTime = orderPlacedTime != null ? orderPlacedTime.format(formatter) : "N/A";
         String formattedCollectedTime = orderCollectedTime != null ? orderCollectedTime.format(formatter) : "N/A";
         return "Order ID: " + orderID +

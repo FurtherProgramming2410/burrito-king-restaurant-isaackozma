@@ -8,9 +8,9 @@ public class Alerts {
         showAlert(Alert.AlertType.ERROR, title, message);
     }
 
-//    public static void confirmationMessage(String title, String message) {
-//        showAlert(Alert.AlertType., title, message);
-//    }
+    public static void confirmationMessage(String title, String message) {
+        showAlert(Alert.AlertType.CONFIRMATION, title, message);
+    }
 
     public static void infoMessage(String title, String message) {
         showAlert(Alert.AlertType.INFORMATION, title, message);
