@@ -153,7 +153,8 @@ public class Order implements Serializable {
                "\nStatus: " + status +
                "\nPlaced Time: " + formattedPlacedTime +
                "\nCollected Time: " + formattedCollectedTime + 
-               "\nTotal Price: $" + String.format("%.2f", calculateTotal()) +
+//               "\nTotal Price: $" + String.format("%.2f", calculateTotal()) +
+               "\nTotal Price: $" + String.format("%.2f", totalAmount) + // changed to accomidate the credits taking off the total cost!!
                "\nItems: " + items.size();
     }
 }
