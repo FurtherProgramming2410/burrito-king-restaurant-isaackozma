@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import Controller.UserManager;
 import Interface.KingItem;
@@ -210,6 +212,13 @@ public class Dashboard {
     }
 	
 	
+	
+	private static boolean isValidEmail(String email) {
+	    String emailConfirm = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+	    Pattern pattern = Pattern.compile(emailConfirm);
+	    Matcher matcher = pattern.matcher(email);
+	    return matcher.matches();
+	}
 
 	private static void emailForVIP(User user) {
         Stage stage = new Stage();
@@ -220,7 +229,8 @@ public class Dashboard {
         pane.setPadding(new Insets(25, 25, 25, 25));
 
         // Heading for email input
-        Label emailHeading = new Label("Would you like to receive promotion information via email?");
+        Label emailHeading = new Label("Would you like to receive promotion information via email?\nPlease add letters and/or numbers before an after an @ to\n"
+        		+ "make it a valid email! ");
         pane.add(emailHeading, 0, 0, 2, 1);
 
         // Text field for email input
@@ -232,13 +242,22 @@ public class Dashboard {
         Button confirmBtn = new Button("Confirm");
         confirmBtn.setOnAction(e -> {
             String email = emailField.getText();
+            if (isValidEmail(email)) {
+                UserManager userManager = UserManager.getInstance();
+                if (userManager.upgradeToVIP(user.getUsername(), email)) {
+                    Alerts.infoMessage("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features.");
+                    stage.close();
+            
 //            if (UserManager.upgradeToVIP(user.getUsername(), email)) {///// orginal before skeleton 
-            UserManager userManager = UserManager.getInstance();
-            if (userManager.upgradeToVIP(user.getUsername(), email)) {
-            	Alerts.infoMessage("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features");
-                stage.close();
+//            UserManager userManager = UserManager.getInstance();
+//            if (userManager.upgradeToVIP(user.getUsername(), email)) {
+//            	Alerts.infoMessage("VIP Upgrade", "You have successfully upgraded to VIP! Please log out and then back in to access exclusive features");
+//                stage.close();
+                } else {
+                    Alerts.errorMessage("Error", "Failed to upgrade to VIP. Please enter a valid email.");
+                }
             } else {
-            	Alerts.errorMessage("Error", "Failed to upgrade to VIP. Please enter a valid email.");
+                Alerts.errorMessage("Invalid Email", "Please enter a valid email address.");
             }
         });
         pane.add(confirmBtn, 0, 2, 2, 1);
@@ -867,8 +886,8 @@ public class Dashboard {
         alert.setContentText(String.format("Total Price: $%.2f\n", totalPrice));
 
         ButtonType confirmButton = new ButtonType("Confirm");
-        ButtonType cancelButton = new ButtonType("Cancel");
-        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+        ButtonType goBackButton = new ButtonType("Go back");
+        alert.getButtonTypes().setAll(confirmButton, goBackButton);
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == confirmButton) {
