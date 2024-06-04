@@ -73,7 +73,7 @@ public class Dashboard {
 	//clears the temp order and basket items
 	//resets the tempOrder object and clears basketItems list.
 	 public void clearTempOrder() {
-	    System.out.println("Clearing tempOrder: Order ID: " + tempOrder.getOrderID() + " Items: " + tempOrder.getItems().size());// get rid of when done
+	    
 	    tempOrder = new Order();
 	    basketItems.clear();
 	    }
@@ -109,9 +109,6 @@ public class Dashboard {
         //Here is the button for viewing orders 
         Button viewOrdersBtn = new Button("View your Orders");
         viewOrdersBtn.setOnAction(e -> {
-        	System.out.println("Attempting to view orders for user: " + user.getUsername() + ", User hash: " + user.hashCode()); //get rid of
-        	System.out.println("Orders count for user: " + user.getOrders().size()); // get rid of
-        	
         	//here the list is being displayed as an observable array
         	//allowing users to see their info from previous orders.
 			ListView<String> orderListView = new ListView<>();
@@ -121,11 +118,9 @@ public class Dashboard {
 			//Here i have it so the user is informed if there are no orders to display.
 			//I also have it so each order is added to the order list.
 			if (user.getOrders().isEmpty()) {
-			    System.out.println("No orders found for user: " + user.getUsername());
 			orders.add("No orders available.");
 			} else {
 			    for (Order order : user.getOrders()) {
-			        System.out.println("Adding order: " + order); //get rid of
 			        orders.add(order.toString());
 			    }
 			}
@@ -198,7 +193,6 @@ public class Dashboard {
         payForOrderBtn.setOnAction(e -> {
 	        if (!tempOrder.getItems().isEmpty()) {
 	        	confirmationMessage(user);///
-	            System.out.println("Placing new order for user: " + user.getUsername());// get rid of
 	        } else {
 	        	Alerts.errorMessage("Add Items", "Add items to your basket before paying.");
 	        }
@@ -365,7 +359,7 @@ public class Dashboard {
 	        if (orderToCancel != null && orderToCancel.getStatus().equals("placed")) {
 	            UserManager userManager = UserManager.getInstance();
 	            userManager.cancelOrder(user.getUsername(), orderID);
-	            Alerts.infoMessage("Cancel Order", "Order" + orderID + " has been successfully cancelled.");
+	            Alerts.infoMessage("Cancel Order", "Order " + orderID + " has been successfully cancelled.");
 	        } else {
 	            Alerts.errorMessage("Cancel Order Error", "Order cannot be cancelled or does not exist.");
 	        }
@@ -468,12 +462,8 @@ public class Dashboard {
 		        //Here i made it so the basket list updates
 		        basketItems.clear();
 		        basketItems.addAll(tempOrder.getItems());
-		        System.out.println("Added to basket: Burritos: " + burritoQty.getText() + ", Fries: " + friesQty.getText() + ", Sodas: " + sodaQty.getText());// change to alert
 		        if (user.isVIP() && finalMealQty != null) {
-		            System.out.println("Meals: " + finalMealQty.getText());
 		        }
-		        System.out.println("Current tempOrder items: " + tempOrder.getItems().size());
-		        
 		        //if the user tries to add something other then a number then this alert will appear
 	    	} catch (NumberFormatException ex) {
 	    		Alerts.errorMessage("Input Error", "Please only enter numbers");
@@ -507,8 +497,6 @@ public class Dashboard {
 	                    break;
 	            }
 	        }
-	        
-	        System.out.println("Added " + quantity + " " + itemName + "(s) to order ID: " + order.getOrderID());//change to alert
 	    } catch (NumberFormatException e) {
 	    	Alerts.errorMessage("Input Error", "Please enter a valid number for the quantity.");
 	    }
@@ -553,6 +541,7 @@ public class Dashboard {
                 //button to confirm the change.
                 Button confirmBtn = new Button("Confirm");
                 confirmBtn.setOnAction(ev -> {
+                	try {
                 	
                 	//parse the new quantity and updates the tempOrder/basket
                     int newQuantity = Integer.parseInt(quantityField.getText());
@@ -564,6 +553,9 @@ public class Dashboard {
                     basketItems.addAll(tempOrder.getItems());
                     quantityStage.close();
                     Alerts.infoMessage("Quantity Updated", "Quantity updated.");
+                	}catch(NumberFormatException ex) {
+                		Alerts.errorMessage("Inpur Error", "Please enter a valid number." );
+                	}
                 });
                 
                 //The textfield and confirm button is added to the VBox
@@ -778,18 +770,7 @@ public class Dashboard {
 	    return vbox;
     }
 		////////////////////////////// need to check if this even works???
-	
-	private void addMealsToOrder(Order order, String quantityStr) {// check if this even works...
-	    try {
-	        int quantity = Integer.parseInt(quantityStr);
-	        for (int i = 0; i < quantity; i++) {
-	            order.addItem(new Meal(7, 4, 2.5), 1);
-	        }
-	        System.out.println("Added " + quantity + " meal(s) to order ID: " + order.getOrderID());
-	    } catch (NumberFormatException e) {
-	    	Alerts.errorMessage("Input Error", "Please enter a valid number for the quantity.");
-	    }
-	}
+
 
 }
 

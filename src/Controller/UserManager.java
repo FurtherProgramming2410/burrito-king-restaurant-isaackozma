@@ -121,7 +121,6 @@ public class UserManager {
     //uses info of the username, first & last name, and the password. 
     //it will set the new info when saved.
     public boolean updateUserProfile(String username, String firstName, String lastName, String password) {
-	    System.out.println("Attempting to update profile for user: " + username);
 	    User user = users.get(username);
 	    if (user != null) {
 	        user.setFirstName(firstName);
@@ -131,7 +130,7 @@ public class UserManager {
 	        Alerts.infoMessage("Successful update", "Profile updated and saved for user: " + username);
 	        return true;
 	    }
-	    System.out.println("User not found: " + username);//change to alert 
+	    Alerts.infoMessage("Wrong input", "Username not found" + username);
 	    return false;
 	}
   //user managment methods
@@ -193,7 +192,6 @@ public class UserManager {
     //I also have the credit system handled if the user is a VIP and using credits.
     //also takes the time at which the order was placed as the user enters that
     public void placeOrder(String username, Order order, String cardNumber, String expiryDate, String cvv, LocalDateTime orderPlacedTime, int creditsUsed) {
-    	System.out.println("Attempting to place order...");
     	if (PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate)
                 && PaymentInfo.validateCVV(cvv)) {
             User user = users.get(username);
@@ -211,17 +209,13 @@ public class UserManager {
                 if (user.isVIP() && creditsUsed > 0) {
                     finalAmount -= (creditsUsed / 100.0);
                     if (user.useCredits(creditsUsed)) {
-                        System.out.println("Credits used successfully.");////////////////chanhge to alert
                     } else {
-                        System.out.println("Not enough credits available.");///////////// change to alert 
                         return;
                     }
                 }
 
                 order.setTotalAmount(finalAmount);
                 user.addOrder(order);
-                System.out.println("Order placed successfully for user: " + username + ". Order ID: " + order.getOrderID());//// probably dont need
-
                 int creditsEarned = (int) finalAmount;
                 user.addCredits(creditsEarned);
 
@@ -248,7 +242,7 @@ public class UserManager {
 	            Alerts.infoMessage("Orders Collected", "Order " + orderID + " collected.");
 	            saveOrdersToFile(); 
 	        } else {
-	            System.out.println("Invalid time to collect or order has been cancelled.");///////// change to alert
+	            Alerts.errorMessage("Invalid time", "Invalid time, cant collected at that time");
 	        }
 	    }
 	}
@@ -265,12 +259,14 @@ public class UserManager {
  	        if (order != null && "placed".equals(order.getStatus())) {
  	            order.setStatus("cancelled");
  	            saveOrdersToFile();
- 	            System.out.println("Order " + orderID + " cancelled.");// have to change to alert
+ 	            
  	        } else {
- 	            System.out.println("Order cannot be cancelled.");//change to alert
+ 	            
+ 	            Alerts.errorMessage("Cannot cancel", "Order cannont be cancelled");
  	        }
  	    } else {
- 	        System.out.println("User not found.");//change to alert
+ 	        
+ 	        Alerts.errorMessage("Cannot cancel", "User not found");
  	    }
  	}
     
@@ -356,14 +352,14 @@ public class UserManager {
 		                            .collect(Collectors.joining(", "));
 		                        csvValues.add(itemNames);
 							}
-							bufferedWriter.write(String.join(",", csvValues));
+							bufferedWriter.write(String.join(",", csvValues)); 
 							bufferedWriter.newLine();
 						}
 						//Alerts just to provide users info if it worked or not
 						Alerts.infoMessage("Export success", "Orders exported successfully to " + filePath);
-						System.out.println("Orders exported successfully to " + filePath);
 				} catch (IOException e) {
-					System.out.println("Failed to export orders: " + e.getMessage()); // change to alert.
+
+					Alerts.errorMessage("Failed to export orders", "Cannot export" + e.getMessage());
 				}
 			}
 		}
@@ -476,7 +472,8 @@ public class UserManager {
                 users.putIfAbsent(entry.getKey(), entry.getValue());
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Users file not found, starting with an empty user list.");/////////////////////////Change to alert
+            Alerts.errorMessage("User file not found", "Starting with empty user list");
+            
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error loading users: " + e.getMessage());/////////////////////////Change to alert
         }
@@ -490,7 +487,6 @@ public class UserManager {
     public void saveUsersToFile() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
             objectOutputStream.writeObject(users);
-            System.out.println("Users saved successfully.");/////////////////////////Change to alert
         } catch (IOException e) {
             System.out.println("Error saving users: " + e.getMessage());/////////////////////////Change to alert
         }
@@ -504,7 +500,6 @@ public class UserManager {
     public void loadOrdersFromFile() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(ORDERS_FILE))) {
             users = (Map<String, User>) objectInputStream.readObject(); 
-            System.out.println("Orders loaded successfully for all users.");
         } catch (FileNotFoundException e) {
             System.out.println("Orders file not found, starting with an empty orders list.");
         } catch (IOException | ClassNotFoundException e) {
@@ -519,7 +514,7 @@ public class UserManager {
     public void saveOrdersToFile() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(ORDERS_FILE))) {
             objectOutputStream.writeObject(users);
-	        System.out.println("Orders saved successfully for all users.");
+//	        System.out.println("Orders saved successfully for all users.");
 	    } catch (IOException e) {
 	        System.out.println("Error saving orders: " + e.getMessage());
 	    }

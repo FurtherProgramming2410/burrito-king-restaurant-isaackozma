@@ -117,11 +117,9 @@ public class OrderOnDashBoard {
 
                 //here the program retrieves the tempOrder 
                 Order tempOrder = app.getDashboard().getTempOrder();
-                System.out.println("Placing order ID: " + tempOrder.getOrderID() + " with items: " + tempOrder.getItems().size());// get rid of
 
-                for (KingItem item : tempOrder.getItems()) {
-                    System.out.println("Item: " + item.getName() + " Price: " + item.getPrice());
-                }
+
+                
                 //here the payment details are validated
                 //If there are any issues then an alert will appear informing the user
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
@@ -138,7 +136,6 @@ public class OrderOnDashBoard {
                     //an alert will info the user of the preptime, price, orderID and the time which the order was placed.
                     //alerts will appear if there are any issues that arise such as invalid payment or wrong time format.
                     userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
-                    System.out.println("Order placed: " + tempOrder);// get rid of
                     UserManager.getInstance().placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
                     UserManager.getInstance().saveOrdersToFile();
                     int preparationTime = UserManager.getInstance().calculatePreparationTime(tempOrder);
