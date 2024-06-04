@@ -28,42 +28,69 @@ import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
 import util.Alerts;
 
-//This class is used for the layout and functionality for placing an order on the dahsboard
-
+//This class is used for the layout and functionality for paying for an order.
 public class OrderOnDashBoard {
-    public static GridPane createOrderPlacement(User user) {
+	
+	private BurritoKingApp app;
+
+	//this constructor takes BurritoKingApp instance as a parameter
+    public OrderOnDashBoard(BurritoKingApp app) {
+        this.app = app;
+    }
+	
+	//This method creates the layout for placing an order
+    //ive set the alignment, horizontal and vertical gaps between the cells
+    //and set the padding
+    public GridPane createOrderPlacement(User user) {
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
         pane.setHgap(10);
         pane.setVgap(10);
         pane.setPadding(new Insets(25, 25, 25, 25));
 
+        //Label and textfield for the creditcard number 
+        //user can enter their credit card number here
         Label cardNumberLabel = new Label("Please enter a fake Credit Card Number(16 numbers):");
         TextField cardNumberField = new TextField();
         cardNumberField.setMaxWidth(150);
 
+        //Label and textfield for the expiry date 
+        //user can enter their dates here
         Label expiryDateLabel = new Label("Expiry Date (MM/YY):");
         TextField expiryDateField = new TextField();
         expiryDateField.setMaxWidth(50);
 
+        //Label and textfield for the CVV
+        //user can enter their CVV here
         Label cvvLabel = new Label("CVV (3 Numbers):");
         TextField cvvField = new TextField();
         cvvField.setMaxWidth(50);
 
+        //Label and textfield for the the fake time the user needs to enter
         Label fakeTimeLabel = new Label("Fake Time (HH:mm):");
         TextField fakeTimeField = new TextField();
         fakeTimeField.setMaxWidth(100);
 
+        //Label and textfield for the Credits
+        //user can enter the number of credits they want to use here
+        //Will only appear if user is VIP
         Label creditsLabel = new Label("Credits to use (enter 0 if none):");
         TextField creditField = new TextField();
         creditField.setMaxWidth(100);
 
+        //hides credits field if user is not a VIP
         if (!user.isVIP()) {
             creditsLabel.setVisible(false);
             creditField.setVisible(false);
         }
-
+        
+        //Button to place the order.
         Button placeOrderBtn = new Button("Place Order");
+        UserManager userManager = UserManager.getInstance();
+        
+        //Here is the code for the action that will take place when the button is pressed
+        //here the program retreives all the information from the user 
+        //if any of it is empty then the user will be alerted of this.
         placeOrderBtn.setOnAction(e -> {
             String cardNumber = cardNumberField.getText();
             String expiryDate = expiryDateField.getText();
@@ -77,6 +104,8 @@ public class OrderOnDashBoard {
             }
 
             try {
+            	//here the program parse the fake time which is entered by the user
+            	//if they enter an invaild time than an alert will occur.
                 String[] timeSplit = fakeTimeStr.split(":");
                 if (timeSplit.length != 2) {
                     throw new DateTimeParseException("Invalid time format", fakeTimeStr, 0);
@@ -86,48 +115,37 @@ public class OrderOnDashBoard {
                 int minute = Integer.parseInt(timeSplit[1]);
                 LocalDateTime fakeTime = LocalDateTime.now().withHour(hour).withMinute(minute);
 
-                Order tempOrder = Dashboard.getTempOrder();
-                System.out.println("Placing order ID: " + tempOrder.getOrderID() + " with items: " + tempOrder.getItems().size());
+                //here the program retrieves the tempOrder 
+                Order tempOrder = app.getDashboard().getTempOrder();
+                System.out.println("Placing order ID: " + tempOrder.getOrderID() + " with items: " + tempOrder.getItems().size());// get rid of
 
                 for (KingItem item : tempOrder.getItems()) {
                     System.out.println("Item: " + item.getName() + " Price: " + item.getPrice());
                 }
-
+                //here the payment details are validated
+                //If there are any issues then an alert will appear informing the user
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
                     int credits = Integer.parseInt(creditsStr);
-//                    UserManager userManager = UserManager.getInstance();//added skeleton// changed for credits
                     if (user.isVIP() && credits > 0) {
-//                        boolean success = UserManager.useCredits(user.getUsername(), credits);
-                    	
-//                        boolean success = userManager.useCredits(user.getUsername(), credits);// added skelton
-                    	boolean success = UserManager.getInstance().useCredits(user.getUsername(), credits);// changed for credits
+                    	boolean success = UserManager.getInstance().useCredits(user.getUsername(), credits);
                         if (!success) {
                         	Alerts.errorMessage("Order Error", "Failed to use credits. Please check your credits balance.");
                             return;
                         }
                     }
-                    
 
-//                    UserManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // loss skeleton
-                    
-//                    userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits); // added skeleton
-                    UserManager.getInstance().placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);// changed for credits
-                    System.out.println("Order placed: " + tempOrder);
-
-//                    UserManager.saveOrdersToFile(); // loss skeleton 
-                    
-                    
-//                    userManager.saveOrdersToFile();// addded skelton
-                    UserManager.getInstance().saveOrdersToFile();//changed for credits
-                    System.out.println("Order placed and saved successfully!");
-
-//                    int preparationTime = UserManager.calculatePreparationTime(tempOrder); // loss skeleton
-//                    int preparationTime = userManager.calculatePreparationTime(tempOrder);// added skelton 
-                    int preparationTime = UserManager.getInstance().calculatePreparationTime(tempOrder);// changed for credits
+                    //Here the user places the order and saves all the details
+                    //an alert will info the user of the preptime, price, orderID and the time which the order was placed.
+                    //alerts will appear if there are any issues that arise such as invalid payment or wrong time format.
+                    userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
+                    System.out.println("Order placed: " + tempOrder);// get rid of
+                    UserManager.getInstance().placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
+                    UserManager.getInstance().saveOrdersToFile();
+                    int preparationTime = UserManager.getInstance().calculatePreparationTime(tempOrder);
                     Alerts.infoMessage("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes. "
-                    		+ "\n" + tempOrder);
-                    Dashboard.clearTempOrder();
-                    BurritoKingApp.showDashboard(user);
+                            + "\n" + tempOrder);
+                    app.getDashboard().clearTempOrder();
+                    app.showDashboard(user);
                 } else {
                     Alerts.errorMessage("Order Error", "Invalid payment details. Please check your inputs and try again.");
                 }
@@ -136,6 +154,7 @@ public class OrderOnDashBoard {
             }
         });
 
+        //Here the components are added to the grid pane
         pane.add(cardNumberLabel, 0, 0);
         pane.add(cardNumberField, 1, 0);
         pane.add(expiryDateLabel, 0, 1);
@@ -152,28 +171,29 @@ public class OrderOnDashBoard {
 
 
 	//
-	private static void itemsBeingOrdered(Order order, String itemName, int quantity) {///// this even being used anymore?
-		for(int i = 0; i < quantity; i++) {
-			switch(itemName) {
-			case "Burrito":
-				order.addItem(new FoodItem("Burrito", 7, 1), 1);
-				break;
-			case "Fries":
-				order.addItem(new FoodItem("Fries", 4, 1),1);
-				break;
-			case "Soda":
-				order.addItem(new FoodItem("soda", 2.5, 1), 1);
-			}
-		}
-	}
 	
-	//method that makes sure the order is valid
-	//alows for a check of all the vital needs.
-	 private static boolean validateOrder(String cardNumber, String expiryDate, String cvv) {
+	
+	//This method validates the order by checking the payment details
+    //uses paymentInfo to ensure that the card is legit and everything is correct.
+	 private boolean validateOrder(String cardNumber, String expiryDate, String cvv) {
 	        return PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate) && PaymentInfo.validateCVV(cvv);
 	    }
 
 	
+	 private static void itemsBeingOrdered(Order order, String itemName, int quantity) {///// this even being used anymore?
+			for(int i = 0; i < quantity; i++) {
+				switch(itemName) {
+				case "Burrito":
+					order.addItem(new FoodItem("Burrito", 7, 1), 1);
+					break;
+				case "Fries":
+					order.addItem(new FoodItem("Fries", 4, 1),1);
+					break;
+				case "Soda":
+					order.addItem(new FoodItem("soda", 2.5, 1), 1);
+				}
+			}
+		}
 	private static LocalDateTime parseFakeTime(String fakeTime) {/// yeah nah probably change this.
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");

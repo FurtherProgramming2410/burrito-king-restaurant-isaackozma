@@ -10,13 +10,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-
+//this class handles the registration of a new user
 public class Registration {
 	
-	//here i create the basic layout of the registration screen
-	//so far i've made all of the screens the same layout
-	//the further along the program goes I believe there will be more changes
-	public static GridPane createRegistration() {
+	//reference to the main application instance
+	private BurritoKingApp app;
+
+	//Constructor that initializes the app reference
+    public Registration(BurritoKingApp app) {
+        this.app = app;
+    }
+	
+	//Here ive created the registration page layout
+    //allows for users to enter all crical info, name, username and password.
+	public GridPane createRegistration() {
 		//I here set the alignment of the grid.
 		//i set the vertical and horizontal gaps
 		//Also set the padding 
@@ -25,7 +32,7 @@ public class Registration {
 		pane.setHgap(10);
 		pane.setVgap(10);
 		pane.setPadding(new Insets(25, 25, 25, 25));
-		pane.getStyleClass().add("grid-pane");// do i still need this?? I think this was from an early version?
+		
 		
 		//Here i created a label for the user for the username
 		//i also positioned it
@@ -72,41 +79,35 @@ public class Registration {
 		//when clicked it gets the information from the text fields
 		//username, password, first & last name
 		Button btnRegiester = new Button("Register");
-		
 		btnRegiester.setOnAction(event -> {
 			String username = userNameTextField.getText();
 			String password = passwordEntryField.getText();
 			String firstName = firstNameField.getText();
 			String lastName = lastNameField.getText();
 			
-			//here to check if anyting is empty 
+			//here the program checks if anything is empty, all fields need to be filled out to register
 			 if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
 				 Alerts.errorMessage("Registration Error", "All fields must be filled out.");
 			        return;
 			    }
+			 //Here the program gets the instance of user manager
+			 UserManager userManager = UserManager.getInstance();
 			 
-			 
-			 UserManager userManager = UserManager.getInstance();//skeleton
-			 
-			//boolean is used to register the user, checks if it is unique
-//			boolean registered = UserManager.registerUser(username, password, firstName, lastName);//loss skeleton 
-			 boolean registered = userManager.registerUser(username, password, firstName, lastName);//skeleton
+			 //boolean is used to register the user, checks if it is unique
+			 boolean registered = userManager.registerUser(username, password, firstName, lastName);
 		
 			//if the registration is ok then it will direct the user to the login area
-			if(registered ) {
-				Alerts.infoMessage("registration Successful", "Account successfully registered");
-				BurritoKingApp.showLogin();
+			 if(registered ) {
+				 Alerts.infoMessage("registration Successful", "Account successfully registered");
+				 app.showLogin();
 			
 			//if its not unique it will say the attempt was unsucessful.
-			}else {
-				Alerts.errorMessage("Registration error", "Username already exists");
-			}
+			 }else {
+				 Alerts.errorMessage("Registration error", "Username already exists");
+				 }
 			});
 			pane.add(btnRegiester, 1, 5);
 		
 		return pane;
 	}
-	
-	
-
 }

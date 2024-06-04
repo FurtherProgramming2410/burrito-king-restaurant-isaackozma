@@ -12,56 +12,64 @@ import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 import util.Alerts;
 
-//this class is just so the user can edit their profile
+//this class is for the ability to edit the profile of a user.
 public class Profile {
 	
-	//setting up the display of the profile page
-	//i give the user the ability to edit their names and password. 
-	// not the username as that was said not to.
-	public static GridPane createProfile(User user) {
+	//reference to the main application instance
+	private BurritoKingApp app;
+
+	//constructor that initializes the app reference
+    public Profile(BurritoKingApp app) {
+        this.app = app;
+    }
+	
+	//this method is used to create the edit profile page layout
+    //It will allow for users to edit their first & last name as well as the password.
+    //set the alignment and spacing the same as other classes
+	public  GridPane createProfile(User user) {
 		GridPane pane = new GridPane();
 		pane.setAlignment(Pos.CENTER);
 		pane.setHgap(10);
 		pane.setVgap(10);
 		pane.setPadding(new Insets(25, 25, 25, 25));
 		
+		//Label and textField for first name
 		Label firstNameLabel = new Label("First Name:");
         TextField firstNameField = new TextField(user.getFirstName());
         pane.add(firstNameLabel, 0, 0);
         pane.add(firstNameField, 1, 0);
 
+        //label and textfield for last name
         Label lastNameLabel = new Label("Last Name:");
         TextField lastNameField = new TextField(user.getLastName());
         pane.add(lastNameLabel, 0, 1);
         pane.add(lastNameField, 1, 1);
 
+        //label and textfield for password
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
         pane.add(passwordLabel, 0, 2);
         pane.add(passwordField, 1, 2);
         
-        
+        //Here the program gets the instance of UserManager
         UserManager userManager = UserManager.getInstance();
         
-        
-        //here I make a save button for the changes
-        //takes the info added and updates it in usermanager class.
-        //user is then taken back to the dashboard. 
+        //Here I create the save button which when clicked updates the user profile
         Button saveBtn = new Button("Save");
         saveBtn.setOnAction(e ->{
-        	
         	if (passwordField.getText().isEmpty()) {
         		Alerts.errorMessage("Update Error", "Password must be filled out. Can be the same or different");
-                return;
-            }
-        	
-        	user.setFirstName(firstNameField.getText());
-        	user.setLastName(lastNameField.getText());
-        	user.setPassword(passwordField.getText());
-//        	UserManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText()); // orginal before skeloton
-        	
-        	userManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText()); // change with skeleton 
-        	BurritoKingApp.showDashboard(user);
+        		return;
+        	}
+        	//here the user object is updated with the new values given by the user.
+        	 user.setFirstName(firstNameField.getText());
+             user.setLastName(lastNameField.getText());
+             user.setPassword(passwordField.getText());
+             
+             //here the program uodates the user profile in the UserManager class
+             //It then returns the user back to the dashboard.
+             userManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText());
+             app.showDashboard(user);
         });
         
         pane.add(saveBtn, 1, 3);

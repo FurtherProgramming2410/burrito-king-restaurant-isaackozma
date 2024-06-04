@@ -10,22 +10,22 @@ import java.util.Random;
 import Interface.KingItem;
 
 
-//in this class is where the order process is
+//This class represents an order in the burrito king program
+//Ive implemented Serializable to allow order to be serialized and saved
 public class Order implements Serializable {
 	
-	//changed from my original A1 submission to handle the interface and meals
-	//holds objects of kingitem.
+	//Serial version UID for serialization
+	//the List stores items in the order
+	//orderID is unique for each order
 	private static final long serialVersionUID = 1L;
     private List<KingItem> items = new ArrayList<>();
     private int orderID;
     private String status;
     private LocalDateTime orderPlacedTime;
     private LocalDateTime orderCollectedTime;
-    private double actualPaidAmount; //change this name!!!!!!!!!!!!!
-    
-    private double totalAmount;// for credits
-    
-    private static int idCounter = 0;
+    private double actualPaidAmount; 
+    private double totalAmount;
+    private static int idCounter = 0;//not current being used, can get rid of
     
     
     //constructor to initialise a order with new ID and status of order
@@ -36,9 +36,7 @@ public class Order implements Serializable {
     	this.orderID = generateOrderID();
         this.status = "new";
         this.items = new ArrayList<>();
-    	
-//    	this.orderID = ++idCounter;
-//    	this.status = "new";
+
     }
     
     
@@ -47,22 +45,22 @@ public class Order implements Serializable {
     	return orderID;
     }
 
-    //adds the numer of kingitem objects to the order
-    //I used a loop to add the item to the items list.
+    //adds the number of kingitem objects to the order
+    //I used a for loop to add the item to the items list.
     public void addItem(KingItem item, int quantity) {
     	for (int i = 0; i < quantity; i++) {
             this.items.add(item);
         }
     }
 
-    //generates a number for the ID
+    //this method generates a random number for the ID
+	//made it to 1000 as I didnt know how many i should make it? 
     private int generateOrderID() {
-        return new Random().nextInt(1000);// explain why 1000 was the limit, makes sense?
+        return new Random().nextInt(1000);
     }
     
-    
+    //this method is used to find the total price
     //calculates the total cost by going through each food item that is within item
-    //returns the cost as a double
     public double calculateTotal() {
     	double total = 0;
         for (KingItem item : this.items) {
@@ -73,14 +71,10 @@ public class Order implements Serializable {
     }
 
     //method is for the process of payments.
-    //calculates the cost of the order then subtracts the amount paid
-    //will be able to tell if its enough and then give change if needed.
-    //also added and else which will tell the user if the amount given is not enough.
-
-    
-    public double processPayment(double amountPaid, int creditsUsed) {// added credits as well ,need to test to see if it works correctly
+    //takes the credits value if credits used
+    public double processPayment(double amountPaid, int creditsUsed) {
         double total = calculateTotal();
-        double creditValue = creditsUsed / 100.0;//once finalised credit system, change from value, maybe credit amount, check with userManager so i dont get confused
+        double creditValue = creditsUsed / 100.0;
         double finalTotal = total - creditValue;
         double change = amountPaid - finalTotal;
         if (change >= 0) {
@@ -90,12 +84,12 @@ public class Order implements Serializable {
         }
     }
     
-    
+    //getter for the actual amount paid
     public double getActualPaidAmount() {
     	return actualPaidAmount;
     }
     
-    //returns the list of objects to the order.
+    //getter for the list of objects in the order.
     public List<KingItem> getItems() {
         return items;
     }
@@ -131,30 +125,30 @@ public class Order implements Serializable {
     }
     
     
-    	///////////////////////for credits
+    //setter for the totalAmount
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
     
+    //getter for the totalAmount
     public double getTotalAmount() {
         return totalAmount;
     }
     
-    ////////////for credits
+   
     
     //override method to display the orders details
-    //order could not print accurately without it
+    //formats the placed and collected times and it includes all details about the order.
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");//need to change format now that it finally works correctly
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         String formattedPlacedTime = orderPlacedTime != null ? orderPlacedTime.format(formatter) : "N/A";
         String formattedCollectedTime = orderCollectedTime != null ? orderCollectedTime.format(formatter) : "N/A";
         return "Order ID: " + orderID +
                "\nStatus: " + status +
                "\nPlaced Time: " + formattedPlacedTime +
                "\nCollected Time: " + formattedCollectedTime + 
-//               "\nTotal Price: $" + String.format("%.2f", calculateTotal()) +
-               "\nTotal Price: $" + String.format("%.2f", totalAmount) + // changed to accomidate the credits taking off the total cost!!
+               "\nTotal Price: $" + String.format("%.2f", totalAmount) + 
                "\nItems: " + items.size();
     }
 }

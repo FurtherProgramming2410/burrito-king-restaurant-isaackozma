@@ -12,10 +12,21 @@ import javafx.scene.layout.GridPane;
 import util.Alerts;
 
 public class Login {
+	
+	private BurritoKingApp app;
+
+    public Login(BurritoKingApp app) {
+        this.app = app;
+    }
+	
+	
 	//here i create the basic layout of the login screen
 	//so far i've made all of the screens the same layout
 	//the further along the program goes I believe there will be more changes
-	public static GridPane createLogin() {
+	public GridPane createLogin() {
+		
+		
+		
 		//I here set the alignment of the grid.
 		//i set the vertical and horizontal gaps
 		//Also set the padding 
@@ -72,7 +83,7 @@ public class Login {
 			
 //			User user = UserManager.loginUser(username, password); // was the orginal before change!!!!!!!!!!!!!!!!
 			if (user != null) {
-				BurritoKingApp.showDashboard(user);
+				app.showDashboard(user);
 				
 				//otherwise this message will print saying there was an issue with the log in
 			}else {
@@ -86,7 +97,7 @@ public class Login {
 		// here i have a register button if the user has not got a profile yet.
 		//the button when pressed triggers an action which takes users to the registration screen.
 		Button btnToRegister = new Button("Register");
-		btnToRegister.setOnAction(event -> BurritoKingApp.showRegistration());
+		btnToRegister.setOnAction(event -> app.showRegistration());
 		pane.add(btnToRegister, 1, 5);
 		
 		return pane;

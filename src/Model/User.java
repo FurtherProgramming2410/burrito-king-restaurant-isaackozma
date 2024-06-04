@@ -97,7 +97,9 @@ public class User implements Serializable {
 	
 	//adds order to the list from a user
 	public void addOrder(Order order) {
-		this.orders.add(order);
+		if (!orders.contains(order)) {
+	        this.orders.add(order);//////////////////////////////////changed
+	    }
 	}
 	
 	/////////////////////////////// vip stuff
