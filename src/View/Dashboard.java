@@ -311,7 +311,20 @@ public class Dashboard {
 
 	        int hour = Integer.parseInt(timeSplit[0]);
 	        int minute = Integer.parseInt(timeSplit[1]);
+	        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+	            Alerts.errorMessage("Collect Order Error", "Invalid time entered. Please enter a valid time in HH:mm format.");
+	            return;
+	        }
+	        
+	        LocalDateTime orderPlacedTime = user.getOrderById(orderID).getOrderPlacedTime();//////////////////////////
 	        LocalDateTime collectTime = LocalDateTime.now().withHour(hour).withMinute(minute);
+	        
+	        //made this change so that users can place an order at 11:55pm and still be able to pick up past midnight
+	        //if not include the program cant register that the pick up time is actually after the placement of the order
+	        if (collectTime.isBefore(orderPlacedTime)) {
+	            collectTime = collectTime.plusDays(1);
+	        }
+
 
 	        //Here i have made it so the order is retrieved by the orderID
 	        Order orderToCollect = user.getOrderById(orderID);
@@ -727,50 +740,6 @@ public class Dashboard {
 	    return logoutBtn;
 	}
 	
-	
-	 
-	private VBox createOrdersDisplay(User user) { /// I dont need this method
-		VBox vbox = new VBox(10);
-	    vbox.setPadding(new Insets(20, 0, 20, 0));
-	    vbox.setAlignment(Pos.CENTER);
-
-	    Label ordersLabel = new Label("Your Orders:");
-	    ListView<Order> ordersListView = new ListView<>();
-	    ObservableList<Order> ordersList = FXCollections.observableArrayList(user.getOrders());
-	    
-	    //I dont think this is needed now that i fixed the date issue 
-	    LocalDateTime fallbackDate = LocalDateTime.now();
-	    for (Order order : ordersList) {
-	        if (order.getOrderPlacedTime() == null) {
-	            order.setOrderPlacedTime(fallbackDate);//////////////////////////////////////////////////////////////////Remove maybe???
-	        }
-	    }
-
-	    ordersList.sort(Comparator.comparing(Order::getOrderPlacedTime, Comparator.nullsLast(Comparator.reverseOrder())));
-	    
-	    //sets the orders sorted in the Listview
-	    ordersListView.setItems(ordersList);
-	    ordersListView.setCellFactory(param -> new ListCell<Order>() {
-	        @Override
-	        protected void updateItem(Order order, boolean empty) {
-	            super.updateItem(order, empty);
-	            if (empty || order == null) {
-	                setText(null);
-	            } else {
-	                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");/////////////////////// need to change the format now!
-	                String formattedPlacedTime = order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().format(formatter) : "N/A";
-	                String formattedCollectedTime = order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().format(formatter) : "N/A";
-	                setText(String.format("Order ID: %d\nStatus: %s\nPlaced Time: %s\nCollected Time: %s\nTotal Price: $%.2f\nItems: %d", 
-	                        order.getOrderID(), order.getStatus(), formattedPlacedTime, formattedCollectedTime, order.calculateTotal(), order.getItems().size()));
-	            }
-	        }
-	    });
-	    vbox.getChildren().addAll(ordersLabel, ordersListView);
-
-	    return vbox;
-    }
-		////////////////////////////// need to check if this even works???
-
 
 }
 

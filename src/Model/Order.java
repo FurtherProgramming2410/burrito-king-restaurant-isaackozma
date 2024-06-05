@@ -25,7 +25,7 @@ public class Order implements Serializable {
     private LocalDateTime orderCollectedTime;
     private double actualPaidAmount; 
     private double totalAmount;
-    private static int idCounter = 0;//not current being used, can get rid of
+//    private static int idCounter = 0;//not current being used, can get rid of
     
     
     //constructor to initialise a order with new ID and status of order

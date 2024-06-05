@@ -17,9 +17,10 @@ public class User implements Serializable {
 	private String password;
 	private List<Order> orders;
 	
+	// list of orders by the user
 	private Order currentOrder;
 	
-	
+	//vip details
 	private boolean isVIP;
 	private int credits;
 	private String email;
@@ -38,7 +39,8 @@ public class User implements Serializable {
 	
 	
 	//method to get the current order. 
-	public Order getCurrentOrder() {//might need to change this method before final 
+	//if there is no order that exists then it creates a new one. 
+	public Order getCurrentOrder() {
 		if(currentOrder == null) {
 			currentOrder = new Order();
 			
@@ -91,59 +93,71 @@ public class User implements Serializable {
 		return orders;
 	}
 	
+	//setter for order placed by users
 	public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 	
 	//adds order to the list from a user
+	//it makes sure there arent any duplicates
 	public void addOrder(Order order) {
 		if (!orders.contains(order)) {
-	        this.orders.add(order);//////////////////////////////////changed
+	        this.orders.add(order);
 	    }
 	}
 	
 	/////////////////////////////// vip stuff
+	//getter for credits 
 	public int getCredits() {
 		return credits;
 	}
 	
+	//setter for credits
 	public void setCredits(int credits) {
         this.credits = credits;
     }
 	
+	//getter for VIP status
 	public boolean isVIP() {
 		return isVIP;
 	}
 	
+	//setter for vip status
 	public void setVIP(boolean isVIP) {
         this.isVIP = isVIP;
     }
 	
+	//setter for users email
 	public String getEmail() {
 		return email;
 	}
 	
+	//setter for users email
 	public void setEmail(String email) {
         this.email = email;
     }
 	
+	//upgrades user to vip status and sets their email
 	public void upgradeToVIP(String email) {
 		this.isVIP = true;
 		this.email = email;
 
 	}
+	
+	//adds credito users account
 	public void addCredits(int credits) {
 		this.credits += credits;
 	}
 	
 	
-	
+	//deducts credits from users
 	public void deductCredits(int credits) {
 	    if (this.credits >= credits) {
 	        this.credits -= credits;
 	    }
 	}
 	
+	//users credits from account, if they have enough it returns true
 	public boolean useCredits(int credits) {
 		if (this.credits >= credits) {
 			this.credits -= credits;
@@ -158,7 +172,7 @@ public class User implements Serializable {
 	//method used to get an order by its ID
 	public Order getOrderById(int orderId) {
 		for (Order order : orders) {
-			if (order.getOrderID() == orderId) {/// this is confusing, it works but maybe change, leave to end as its not needed, to many orders lol 
+			if (order.getOrderID() == orderId) {
 				return order;
 			}
 		}

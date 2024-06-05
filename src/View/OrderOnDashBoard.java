@@ -113,6 +113,11 @@ public class OrderOnDashBoard {
 
                 int hour = Integer.parseInt(timeSplit[0]);
                 int minute = Integer.parseInt(timeSplit[1]);
+                if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                    Alerts.errorMessage("Order Error", "Invalid time entered. Please enter a valid time in HH:mm format.");
+                    return;
+                }
+                
                 LocalDateTime fakeTime = LocalDateTime.now().withHour(hour).withMinute(minute);
 
                 //here the program retrieves the tempOrder 
@@ -176,32 +181,5 @@ public class OrderOnDashBoard {
 	        return PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate) && PaymentInfo.validateCVV(cvv);
 	    }
 
-	
-	 private static void itemsBeingOrdered(Order order, String itemName, int quantity) {///// this even being used anymore?
-			for(int i = 0; i < quantity; i++) {
-				switch(itemName) {
-				case "Burrito":
-					order.addItem(new FoodItem("Burrito", 7, 1), 1);
-					break;
-				case "Fries":
-					order.addItem(new FoodItem("Fries", 4, 1),1);
-					break;
-				case "Soda":
-					order.addItem(new FoodItem("soda", 2.5, 1), 1);
-				}
-			}
-		}
-	private static LocalDateTime parseFakeTime(String fakeTime) {/// yeah nah probably change this.
-		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-			LocalTime time = LocalTime.parse(fakeTime, formatter);
-			return LocalDateTime.of(LocalDate.now(), time);
-		}catch (DateTimeParseException e) {
-			return null;
-		}
-	}
-	
-	
-	
 
 }

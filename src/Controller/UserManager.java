@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -364,16 +364,7 @@ public class UserManager {
 			}
 		}
     
-    //this method exports the selected orders the user chose to the specified filed with the feilds they selected. 
-    //username, orderID, filethe and fields are all critical for this method.
-    //filepath if not metnioned earlier is the path where orders will be exported. 
-    //
-    public void exportOrders(String username, List<Integer> orderIDs, String filePath, List<String> fields) {
-        User user = users.get(username);
-        if (user != null) {
-            List<Order> orderToExport = user.getOrders().stream().filter(order -> orderIDs.contains(order.getOrderID())).collect(Collectors.toList()); /////////does this method still work?
-        }
-    }
+   
     
   //Order retrieval and exports methods
     
@@ -475,7 +466,7 @@ public class UserManager {
             Alerts.errorMessage("User file not found", "Starting with empty user list");
             
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading users: " + e.getMessage());/////////////////////////Change to alert
+            System.out.println("Error loading users: " + e.getMessage());
         }
     }
 
@@ -488,7 +479,7 @@ public class UserManager {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
             objectOutputStream.writeObject(users);
         } catch (IOException e) {
-            System.out.println("Error saving users: " + e.getMessage());/////////////////////////Change to alert
+            System.out.println("Error saving users: " + e.getMessage());
         }
     }
 
@@ -519,14 +510,14 @@ public class UserManager {
 	        System.out.println("Error saving orders: " + e.getMessage());
 	    }
 	}
-     
-   //this method saves the list of orders.
+    
+     //this method saves the list of orders.
      //It serializes the list of orders and then writes it to the file.
      public void saveOrdersToFile(String filename, List<Order> orders) {
          try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
          	objectOutputStream.writeObject(orders);
          } catch (IOException e) {
-             System.out.println("Error saving orders: " + e.getMessage());///alert
+             System.out.println("Error saving orders: " + e.getMessage());
          }
      }
 
@@ -539,23 +530,12 @@ public class UserManager {
          try (ObjectInputStream objectInputStream  = new ObjectInputStream(new FileInputStream(filename))) {
              return (List<Order>) objectInputStream.readObject();
          } catch (IOException | ClassNotFoundException e) {
-             System.out.println("Error loading orders: " + e.getMessage());//alert
+             System.out.println("Error loading orders: " + e.getMessage());
              return new ArrayList<>();
          }
      }
 
     
-//    private static void ensureDirectoryExists(String filename) {
-    private void ensureDirectoryExists(String filename) {
-        Path path = Paths.get(filename).getParent();
-        if (path != null && !Files.exists(path)) {
-            try {
-                Files.createDirectories(path);
-            } catch (IOException e) {
-                System.out.println("Error creating directories: " + e.getMessage());
-            }
-        }
-    }
     
     
 }
