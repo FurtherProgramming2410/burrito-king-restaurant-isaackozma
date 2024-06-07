@@ -452,7 +452,7 @@ public class UserManager {
                 users.putIfAbsent(entry.getKey(), entry.getValue());
             }
         } catch (FileNotFoundException e) {
-            Alerts.errorMessage("User file not found", "Starting with empty user list");
+            Alerts.infoMessage("User file not found", "Starting with empty user list");
             
         } catch (IOException | ClassNotFoundException e) {
             Alerts.errorMessage("Error loading file", "Error loading users file" + e.getMessage());
@@ -468,7 +468,7 @@ public class UserManager {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
             objectOutputStream.writeObject(users);
         } catch (IOException e) {
-            Alerts.errorMessage("Error saving user", "Error saving users " + e.getMessage());
+            Alerts.infoMessage("Error saving user", "Error saving users " + e.getMessage());
         }
     }
 
@@ -481,9 +481,9 @@ public class UserManager {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(ORDERS_FILE))) {
             users = (Map<String, User>) objectInputStream.readObject(); 
         } catch (FileNotFoundException e) {
-        	Alerts.errorMessage("Orders file not found", "Starting with an empty orders list." + e.getMessage());
+        	Alerts.infoMessage("Orders file not found", "Starting with an empty orders list." + e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
-            Alerts.errorMessage("Error loading file", "Error loading file." + e.getMessage());
+            Alerts.infoMessage("Error loading file", "Error loading file." + e.getMessage());
             
         }
     }
@@ -507,7 +507,7 @@ public class UserManager {
          try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
          	objectOutputStream.writeObject(orders);
          } catch (IOException e) {
-        	 Alerts.errorMessage("Error saving order", "Error saving order " + e.getMessage());
+        	 Alerts.infoMessage("Error saving order", "Error saving order " + e.getMessage());
          }
      }
 
@@ -520,7 +520,7 @@ public class UserManager {
          try (ObjectInputStream objectInputStream  = new ObjectInputStream(new FileInputStream(filename))) {
              return (List<Order>) objectInputStream.readObject();
          } catch (IOException | ClassNotFoundException e) {
-             Alerts.errorMessage("Error Loading order", "Error saving order " + e.getMessage());
+             Alerts.infoMessage("Error Loading order", "Error saving order " + e.getMessage());
              return new ArrayList<>();
          }
      }
