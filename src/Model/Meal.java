@@ -16,22 +16,21 @@ public class Meal implements KingItem, Serializable {
 	
 	// price of a meal after the discount is applied
 	private double price;
-
-	    //constructor which takes all the prices for the items in a meal and minus the discount.
-	    public Meal(double burritoPrice, double friesPrice, double sodaPrice) {
-	        this.price = burritoPrice + friesPrice + sodaPrice - DISCOUNT;
-	    }
-
-	    //Method to get the price of the meal
-	    @Override
-	    public double getPrice() {
-	        return this.price;
-	    }
-
-	    //method to get the name of the meal
-	    @Override
-	    public String getName() {
-	        return "Meal";
-	    }
+	
+	//constructor which takes all the prices for the items in a meal and minus the discount.
+	public Meal(double burritoPrice, double friesPrice, double sodaPrice) {
+		this.price = burritoPrice + friesPrice + sodaPrice - DISCOUNT;
+		}
+	//Method to get the price of the meal
+	@Override
+	public double getPrice() {
+		return this.price;
 	}
+	
+	//method to get the name of the meal
+	@Override
+	public String getName() {
+		return "Meal";
+		}
+}
 

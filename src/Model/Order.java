@@ -3,10 +3,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Random;
-
 import Interface.KingItem;
 
 
@@ -25,7 +23,7 @@ public class Order implements Serializable {
     private LocalDateTime orderCollectedTime;
     private double actualPaidAmount; 
     private double totalAmount;
-//    private static int idCounter = 0;//not current being used, can get rid of
+
     
     
     //constructor to initialise a order with new ID and status of order
@@ -83,7 +81,7 @@ public class Order implements Serializable {
             return -1;
         }
     }
-    
+
     //getter for the actual amount paid
     public double getActualPaidAmount() {
     	return actualPaidAmount;

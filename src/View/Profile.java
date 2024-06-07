@@ -3,7 +3,7 @@ package View;
 import Controller.UserManager;
 import Model.User;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+//import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -62,15 +62,15 @@ public class Profile {
         		return;
         	}
         	//here the user object is updated with the new values given by the user.
-        	 user.setFirstName(firstNameField.getText());
-             user.setLastName(lastNameField.getText());
-             user.setPassword(passwordField.getText());
+        	user.setFirstName(firstNameField.getText());
+            user.setLastName(lastNameField.getText());
+            user.setPassword(passwordField.getText());
              
-             //here the program uodates the user profile in the UserManager class
-             //It then returns the user back to the dashboard.
-             userManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText());
-             app.showDashboard(user);
-        });
+            //here the program uodates the user profile in the UserManager class
+            //It then returns the user back to the dashboard.
+            userManager.updateUserProfile(user.getUsername(), firstNameField.getText(), lastNameField.getText(), passwordField.getText());
+            app.showDashboard(user);
+            });
         
         pane.add(saveBtn, 1, 3);
         return pane;

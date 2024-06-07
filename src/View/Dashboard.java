@@ -3,21 +3,15 @@ import Model.FoodItem;
 import Model.Meal;
 import Model.Order;
 import Model.User;
-import View.OrderOnDashBoard;
 import Controller.UserManager;
-
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import Controller.UserManager;
 import Interface.KingItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,7 +26,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -73,13 +66,12 @@ public class Dashboard {
 	//clears the temp order and basket items
 	//resets the tempOrder object and clears basketItems list.
 	 public void clearTempOrder() {
-	    
 	    tempOrder = new Order();
 	    basketItems.clear();
 	    }
     
 	//Here ive created a dashboard layout
-	 //The layout is defined using GirdPane and has multiple child nodes
+	//The layout is defined using GirdPane and has multiple child nodes
 	public GridPane createDashboard(User user) {
 		GridPane pane = new GridPane(); 
 		
@@ -109,6 +101,7 @@ public class Dashboard {
         //Here is the button for viewing orders 
         Button viewOrdersBtn = new Button("View your Orders");
         viewOrdersBtn.setOnAction(e -> {
+        	
         	//here the list is being displayed as an observable array
         	//allowing users to see their info from previous orders.
 			ListView<String> orderListView = new ListView<>();
@@ -316,9 +309,16 @@ public class Dashboard {
 	            return;
 	        }
 	        
-	        LocalDateTime orderPlacedTime = user.getOrderById(orderID).getOrderPlacedTime();//////////////////////////
+	        Order orderToCollect = user.getOrderById(orderID);
+	        if (orderToCollect == null) {
+	            Alerts.errorMessage("Collect Order Error", "Order not found. Please enter a valid Order ID.");
+	            return;
+	        }
+	        
+	        LocalDateTime orderPlacedTime = user.getOrderById(orderID).getOrderPlacedTime();
 	        LocalDateTime collectTime = LocalDateTime.now().withHour(hour).withMinute(minute);
 	        
+	        	        
 	        //made this change so that users can place an order at 11:55pm and still be able to pick up past midnight
 	        //if not include the program cant register that the pick up time is actually after the placement of the order
 	        if (collectTime.isBefore(orderPlacedTime)) {
@@ -327,7 +327,7 @@ public class Dashboard {
 
 
 	        //Here i have made it so the order is retrieved by the orderID
-	        Order orderToCollect = user.getOrderById(orderID);
+//	        Order orderToCollect = user.getOrderById(orderID);
 	        if (orderToCollect != null) {
 	            UserManager userManager = UserManager.getInstance();
 	            LocalDateTime minCollectTime = orderToCollect.getOrderPlacedTime().plusMinutes(userManager.calculatePreparationTime(orderToCollect));
@@ -343,7 +343,7 @@ public class Dashboard {
 	            	Alerts.errorMessage("Collect Order Error", "Invalid collection time or order has been cancelled.");
 	            }
 	        } else {
-	        	Alerts.errorMessage("Collect Order Error", "Order not found.");
+	            Alerts.errorMessage("Collect Order Error", "Order not found.");
 	        }
 	        //if user puts in an invalid input this alert will appear. 
 	    } catch (NumberFormatException | DateTimeParseException ex) {
@@ -363,7 +363,7 @@ public class Dashboard {
 	    }
 
 	    try {
-	        int orderID = Integer.parseInt(orderIDStr);
+	    	int orderID = Integer.parseInt(orderIDStr);
 	        Order orderToCancel = user.getOrderById(orderID);
 
 	        //here the program checks if the order is placed and in the status of placed

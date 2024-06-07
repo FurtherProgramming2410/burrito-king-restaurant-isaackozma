@@ -19,42 +19,42 @@ public class FoodItem implements KingItem, Serializable{
 	private int quantity;
 	 
 	 //Constructor to initialize a food item with name, price and quantity
-	 public FoodItem(String name, double price, int quantity) {
-		 this.name = name;
-		 this.price = price;
-		 this.quantity = quantity;
+	public FoodItem(String name, double price, int quantity) {
+		this.name = name;
+		this.price = price;
+		this.quantity = quantity;
 	 }
 
 	 //method to update the price and take a new price
-	 public void updatePrice(double newPrice) {
+	public void updatePrice(double newPrice) {
 		this.price = newPrice;
-	 }
+	}
     
-	 //method to update the quantity
-	 //method adds the specified qty to the current qty
-	 public void updateQuantity(int quantity) {
+	//method to update the quantity
+	//method adds the specified qty to the current qty
+	public void updateQuantity(int quantity) {
 		this.quantity += quantity;
-	 }
+		}
     
-	 //getter method for name
-	 public String getName() {
+	//getter method for name
+	public String getName() {
 		return name;
-	 }
+		}
     
-	 //getter method for price
-	 public double getPrice() {
-        return price;
-	 }
+	//getter method for price
+	public double getPrice() {
+		return price;
+		}
     
-	 //getter method for quantity
-	 public int getQuantity() {
+	//getter method for quantity
+	public int getQuantity() {
 		return quantity;
-	 }
+		}
     
-	 //This method returns the name, price and qty of the food item
-	 //Overiding the method to provide a string representation.
-	 @Override
-	 public String toString() {
-       return name + ": $" + String.format("%.2f", price) + " (" + quantity + " available)";
-	 }
+	//This method returns the name, price and qty of the food item
+	//Overiding the method to provide a string representation.
+	@Override
+	public String toString() {
+		return name + ": $" + String.format("%.2f", price) + " (" + quantity + " available)";
+		}
 }

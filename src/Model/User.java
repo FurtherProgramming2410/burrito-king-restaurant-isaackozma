@@ -146,7 +146,8 @@ public class User implements Serializable {
 	
 	//adds credito users account
 	public void addCredits(int credits) {
-		this.credits += credits;
+		 this.credits += credits;
+		 
 	}
 	
 	

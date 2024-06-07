@@ -1,31 +1,19 @@
 package View;
 
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import Controller.PaymentInfo;
 import Controller.UserManager;
-import Interface.KingItem;
-import Model.FoodItem;
 import Model.Order;
-import Model.Meal;
 import Model.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.Scene;
-import javafx.scene.control.PasswordField;
-import javafx.stage.Stage;
 import util.Alerts;
 
 //This class is used for the layout and functionality for paying for an order.
@@ -117,14 +105,11 @@ public class OrderOnDashBoard {
                     Alerts.errorMessage("Order Error", "Invalid time entered. Please enter a valid time in HH:mm format.");
                     return;
                 }
-                
                 LocalDateTime fakeTime = LocalDateTime.now().withHour(hour).withMinute(minute);
 
                 //here the program retrieves the tempOrder 
                 Order tempOrder = app.getDashboard().getTempOrder();
 
-
-                
                 //here the payment details are validated
                 //If there are any issues then an alert will appear informing the user
                 if (validateOrder(cardNumber, expiryDate, cvv)) {
@@ -137,12 +122,12 @@ public class OrderOnDashBoard {
                         }
                     }
 
+
                     //Here the user places the order and saves all the details
                     //an alert will info the user of the preptime, price, orderID and the time which the order was placed.
                     //alerts will appear if there are any issues that arise such as invalid payment or wrong time format.
                     userManager.placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
-                    UserManager.getInstance().placeOrder(user.getUsername(), tempOrder, cardNumber, expiryDate, cvv, fakeTime, credits);
-                    UserManager.getInstance().saveOrdersToFile();
+                    userManager.saveOrdersToFile();
                     int preparationTime = UserManager.getInstance().calculatePreparationTime(tempOrder);
                     Alerts.infoMessage("Order Successful", "Your order has been placed successfully. Preparation time: " + preparationTime + " minutes. "
                             + "\n" + tempOrder);
@@ -171,15 +156,12 @@ public class OrderOnDashBoard {
         return pane;
     }
 
-
-	//
-	
 	
 	//This method validates the order by checking the payment details
     //uses paymentInfo to ensure that the card is legit and everything is correct.
 	 private boolean validateOrder(String cardNumber, String expiryDate, String cvv) {
-	        return PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate) && PaymentInfo.validateCVV(cvv);
-	    }
+		 return PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate) && PaymentInfo.validateCVV(cvv);
+		 }
 
 
 }

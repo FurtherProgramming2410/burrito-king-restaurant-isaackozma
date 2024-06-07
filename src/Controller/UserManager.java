@@ -8,17 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import Interface.KingItem;
 import Model.Meal;
 import Model.Order;
@@ -104,8 +99,7 @@ public class UserManager {
         Alerts.infoMessage("Logged out", "User logged out.");
     }
     
-    
-    
+
     //gets the user by their username
     //returns the user if found
     //used for vip
@@ -121,7 +115,7 @@ public class UserManager {
     //uses info of the username, first & last name, and the password. 
     //it will set the new info when saved.
     public boolean updateUserProfile(String username, String firstName, String lastName, String password) {
-	    User user = users.get(username);
+    	User user = users.get(username);
 	    if (user != null) {
 	        user.setFirstName(firstName);
 	        user.setLastName(lastName);
@@ -133,7 +127,8 @@ public class UserManager {
 	    Alerts.infoMessage("Wrong input", "Username not found" + username);
 	    return false;
 	}
-  //user managment methods
+  //user management methods
+    
     
     
     //VIP methods
@@ -162,7 +157,7 @@ public class UserManager {
 			user.addCredits(credits);
 		}
 	}
-	
+   
     
     //this method handles the use of credits that a user has.
     //It will deduct the amount of credits that are wanted to be used by the user.
@@ -181,7 +176,7 @@ public class UserManager {
 	    return false;
 	}
     
-  //VIP methods
+    //VIP methods
     
     
     //ordering methods
@@ -194,7 +189,7 @@ public class UserManager {
     public void placeOrder(String username, Order order, String cardNumber, String expiryDate, String cvv, LocalDateTime orderPlacedTime, int creditsUsed) {
     	if (PaymentInfo.validateCardNumber(cardNumber) && PaymentInfo.validateExpiryDate(expiryDate)
                 && PaymentInfo.validateCVV(cvv)) {
-            User user = users.get(username);
+    		User user = users.get(username);
             if (user != null) {
                 order.setOrderPlacedTime(orderPlacedTime);
                 order.setStatus("placed");
@@ -208,22 +203,20 @@ public class UserManager {
                 //it wont allow users to go negative in credit, user has to have enough.
                 if (user.isVIP() && creditsUsed > 0) {
                     finalAmount -= (creditsUsed / 100.0);
-                    if (user.useCredits(creditsUsed)) {
-                    } else {
-                        return;
+                    if (finalAmount < 0) {
+                        finalAmount = 0;
                     }
+                    user.useCredits(creditsUsed);
                 }
-
                 order.setTotalAmount(finalAmount);
                 user.addOrder(order);
                 int creditsEarned = (int) finalAmount;
                 user.addCredits(creditsEarned);
-
                 saveOrdersToFile();
                 saveUsersToFile();
             }
         } else {
-            System.out.println("Invalid payment details provided.");/// change to alert
+            Alerts.errorMessage("Invalid Payment", "Invalid payment details provided.");
         }
     }
     
@@ -259,13 +252,10 @@ public class UserManager {
  	        if (order != null && "placed".equals(order.getStatus())) {
  	            order.setStatus("cancelled");
  	            saveOrdersToFile();
- 	            
  	        } else {
- 	            
  	            Alerts.errorMessage("Cannot cancel", "Order cannont be cancelled");
  	        }
- 	    } else {
- 	        
+ 	    } else { 
  	        Alerts.errorMessage("Cannot cancel", "User not found");
  	    }
  	}
@@ -318,52 +308,51 @@ public class UserManager {
             boolean exportPlacedTime, boolean exportCollectedTime, boolean exportTotalPrice, boolean exportItems) {
     	//BufferedWrited used to write the CSV file.
 		User user = users.get(username);
-			if (user != null && orders != null && !orders.isEmpty()) {
-				try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath))) {
+		if (user != null && orders != null && !orders.isEmpty()) {
+			try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath))) {
+				// here I write the CSV headers and use the array list
+				//the listy holds the header names based on which exports are chosen
+				List<String> csvHeaders = new ArrayList<>();
+				if (exportOrderId) csvHeaders.add("OrderID");
+				if (exportStatus) csvHeaders.add("Status");
+				if (exportPlacedTime) csvHeaders.add("PlacedTime");
+				if (exportCollectedTime) csvHeaders.add("CollectedTime");
+				if (exportTotalPrice) csvHeaders.add("TotalPrice");
+				if (exportItems) csvHeaders.add("Items");
+				bufferedWriter.write(String.join(",", csvHeaders));
+				bufferedWriter.newLine();
+				
+				// In this for loop the program writes the order details.
+				//It cycles through the list and writes the corresponding values to the CSV file.
+				for (Order order : orders) {
+					List<String> csvValues = new ArrayList<>();
+					if (exportOrderId) csvValues.add(String.valueOf(order.getOrderID()));
+					if (exportStatus) csvValues.add(order.getStatus());
+					if (exportPlacedTime) csvValues.add(order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().toString() : "");
+					if (exportCollectedTime) csvValues.add(order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().toString() : "");
+					if (exportTotalPrice) csvValues.add(String.valueOf(order.calculateTotal()));
 					
-					// here I write the CSV headers and use the array list
-					//the listy holds the header names based on which exports are chosen
-					List<String> csvHeaders = new ArrayList<>();
-						if (exportOrderId) csvHeaders.add("OrderID");
-						if (exportStatus) csvHeaders.add("Status");
-						if (exportPlacedTime) csvHeaders.add("PlacedTime");
-						if (exportCollectedTime) csvHeaders.add("CollectedTime");
-						if (exportTotalPrice) csvHeaders.add("TotalPrice");
-						if (exportItems) csvHeaders.add("Items");
-						bufferedWriter.write(String.join(",", csvHeaders));
-						bufferedWriter.newLine();
-		
-						// In this for loop the program writes the order details.
-						//It cycles through the list and writes the corresponding values to the CSV file.
-						for (Order order : orders) {
-							List<String> csvValues = new ArrayList<>();
-							if (exportOrderId) csvValues.add(String.valueOf(order.getOrderID()));
-							if (exportStatus) csvValues.add(order.getStatus());
-							if (exportPlacedTime) csvValues.add(order.getOrderPlacedTime() != null ? order.getOrderPlacedTime().toString() : "");
-							if (exportCollectedTime) csvValues.add(order.getOrderCollectedTime() != null ? order.getOrderCollectedTime().toString() : "");
-							if (exportTotalPrice) csvValues.add(String.valueOf(order.calculateTotal()));
-							
-							//Here i made it so it actually lists the items which are purchased.
-							//I wasnt sure if it was just to have a count of items or the actaul items.
-							//its a little messy but it does show what was actually order which i thought was more important.
-							if (exportItems) {
-		                        String itemNames = order.getItems().stream()
-		                            .map(KingItem::getName)
-		                            .collect(Collectors.joining(", "));
-		                        csvValues.add(itemNames);
-							}
-							bufferedWriter.write(String.join(",", csvValues)); 
-							bufferedWriter.newLine();
-						}
-						//Alerts just to provide users info if it worked or not
-						Alerts.infoMessage("Export success", "Orders exported successfully to " + filePath);
-				} catch (IOException e) {
-
-					Alerts.errorMessage("Failed to export orders", "Cannot export" + e.getMessage());
+					//Here i made it so it actually lists the items which are purchased.
+					//I wasnt sure if it was just to have a count of items or the actaul items.
+					//its a little messy but it does show what was actually order which i thought was more important.
+					if (exportItems) {
+						String itemNames = order.getItems().stream()
+                            .map(KingItem::getName)
+                            .collect(Collectors.joining(", "));
+                        csvValues.add(itemNames);
+					}
+					bufferedWriter.write(String.join(",", csvValues)); 
+					bufferedWriter.newLine();
 				}
+				//Alerts just to provide users info if it worked or not
+				Alerts.infoMessage("Export success", "Orders exported successfully to " + filePath);
+		} catch (IOException e) {
+			Alerts.errorMessage("Failed to export orders", "Cannot export" + e.getMessage());
 			}
 		}
+    }
     
+ 
    
     
   //Order retrieval and exports methods
@@ -420,25 +409,25 @@ public class UserManager {
       //It keeps track of the fries that were previously order and that remain (in warmer)
       //fries take 8 min to make.
       private int calculateFriesWaitingTime(int friesNeeded) {
-  	        int numberOfBatchesCooked = 0;
-  	        int totalFriesRequired = friesNeeded - friesRemain;
-  	        
-  	        //here I have made the method calculate if fries are still in warmer or not
-  	        //excessFriesFromLastBatch is like in warmer, just made more sense.
-  	        if (totalFriesRequired > 0) {
-  	            numberOfBatchesCooked = (int) Math.ceil((double) totalFriesRequired / 5);
-  	            int excessFriesFromLastBatch = (numberOfBatchesCooked * 5) - totalFriesRequired;
-  	            friesRemain = Math.min(excessFriesFromLastBatch, 5);
-  	        } else {
-  	            friesRemain -= friesNeeded;
-  	        }
-  	        return numberOfBatchesCooked * 8;
-  	    }
+    	  int numberOfBatchesCooked = 0;
+  	      int totalFriesRequired = friesNeeded - friesRemain;
+  	      //here I have made the method calculate if fries are still in warmer or not
+  	      //excessFriesFromLastBatch is like in warmer, just made more sense.
+  	      if (totalFriesRequired > 0) {
+  	    	  numberOfBatchesCooked = (int) Math.ceil((double) totalFriesRequired / 5);
+  	    	  int excessFriesFromLastBatch = (numberOfBatchesCooked * 5) - totalFriesRequired;
+  	    	  friesRemain = Math.min(excessFriesFromLastBatch, 5);
+  	    	  } else {
+  	    		  friesRemain -= friesNeeded;
+  	    		  }
+  	      return numberOfBatchesCooked * 8;
+  	      }
       
     //Preptime methods
       
       
-      //file handling methods
+      
+     //file handling methods
       
 
     //This method creates the data directory for users and orders files.
@@ -466,7 +455,7 @@ public class UserManager {
             Alerts.errorMessage("User file not found", "Starting with empty user list");
             
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading users: " + e.getMessage());
+            Alerts.errorMessage("Error loading file", "Error loading users file" + e.getMessage());
         }
     }
 
@@ -479,7 +468,7 @@ public class UserManager {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
             objectOutputStream.writeObject(users);
         } catch (IOException e) {
-            System.out.println("Error saving users: " + e.getMessage());
+            Alerts.errorMessage("Error saving user", "Error saving users " + e.getMessage());
         }
     }
 
@@ -492,9 +481,10 @@ public class UserManager {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(ORDERS_FILE))) {
             users = (Map<String, User>) objectInputStream.readObject(); 
         } catch (FileNotFoundException e) {
-            System.out.println("Orders file not found, starting with an empty orders list.");
+        	Alerts.errorMessage("Orders file not found", "Starting with an empty orders list." + e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading orders: " + e.getMessage());
+            Alerts.errorMessage("Error loading file", "Error loading file." + e.getMessage());
+            
         }
     }
     
@@ -505,19 +495,19 @@ public class UserManager {
     public void saveOrdersToFile() {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(ORDERS_FILE))) {
             objectOutputStream.writeObject(users);
-//	        System.out.println("Orders saved successfully for all users.");
+
 	    } catch (IOException e) {
-	        System.out.println("Error saving orders: " + e.getMessage());
+	    	Alerts.errorMessage("Error saving order", "Error saving order " + e.getMessage());
 	    }
 	}
-    
+
      //this method saves the list of orders.
      //It serializes the list of orders and then writes it to the file.
      public void saveOrdersToFile(String filename, List<Order> orders) {
          try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
          	objectOutputStream.writeObject(orders);
          } catch (IOException e) {
-             System.out.println("Error saving orders: " + e.getMessage());
+        	 Alerts.errorMessage("Error saving order", "Error saving order " + e.getMessage());
          }
      }
 
@@ -530,13 +520,11 @@ public class UserManager {
          try (ObjectInputStream objectInputStream  = new ObjectInputStream(new FileInputStream(filename))) {
              return (List<Order>) objectInputStream.readObject();
          } catch (IOException | ClassNotFoundException e) {
-             System.out.println("Error loading orders: " + e.getMessage());
+             Alerts.errorMessage("Error Loading order", "Error saving order " + e.getMessage());
              return new ArrayList<>();
          }
      }
-
-    
-    
+  
     
 }
 

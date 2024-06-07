@@ -22,7 +22,6 @@ public class PaymentInfo {
 	//This method is used to check the expiry date
 	//It was important that the date is valid at the time of purchase.
 	//The use of DateFormatter was for the format of month/year
-	
 	public static boolean validateExpiryDate(String expiryDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
         

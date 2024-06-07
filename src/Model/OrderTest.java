@@ -7,18 +7,20 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import Model.Order;
-import Model.FoodItem;
+
 
 class OrderTest {
 	
 	private Order order;
 	
+	//Did this to ensure that new order object is initialised 
+	//before each test starts
 	@BeforeEach
 	public void setUp() {
 		order = new Order();
 	}
 
+	//This test is to see the additem method works
 	@Test
 	void testAddItem() {
 		FoodItem burrito = new FoodItem("Burrito", 7.0, 1);
@@ -27,29 +29,32 @@ class OrderTest {
 		assertEquals(7.0, order.calculateTotal(), 0.001);
 	}
 
+	//this test is to see if the calculatetotal method works
 	@Test
 	void testCalculateTotal() {
-		 FoodItem burrito = new FoodItem("Burrito", 7.0, 1);
-	     FoodItem fries = new FoodItem("Fries", 4.0, 1);
-	     order.addItem(burrito, 1);
-	     order.addItem(fries, 1);
-	     assertEquals(11.0, order.calculateTotal(), 0.001);// assert equal was found from youtube... do i have to credit this?
-	     //https://www.youtube.com/watch?v=vZm0lHciFsQ&ab_channel=CodingwithJohn
+		FoodItem burrito = new FoodItem("Burrito", 7.0, 1);
+	    FoodItem fries = new FoodItem("Fries", 4.0, 1);
+	    order.addItem(burrito, 1);
+	    order.addItem(fries, 1);
+	    assertEquals(11.0, order.calculateTotal(), 0.001);
 	}
 
+	//this test is to test the set orderplacedtime method
 	@Test
-	void testSetStatus() {
+	void testSetOrderPlacedTime() {
 		LocalDateTime now = LocalDateTime.now();
         order.setOrderPlacedTime(now);
         assertEquals(now, order.getOrderPlacedTime());
 	}
 
+	//tests the setStatus method 
 	@Test
-	void testSetOrderPlacedTime() {
+	void testSetStatus() {
 		order.setStatus("placed");
         assertEquals("placed", order.getStatus());
 	}
 
+	//tests the tostring method
 	@Test
 	void testToString() {
 		FoodItem burrito = new FoodItem("Burrito", 7.0, 1);

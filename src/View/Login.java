@@ -3,7 +3,6 @@ import Controller.UserManager;
 import Model.User;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -24,7 +23,6 @@ public class Login {
 	//so far i've made all of the screens the same layout
 	//the further along the program goes I believe there will be more changes
 	public GridPane createLogin() {
-		
 		
 		
 		//I here set the alignment of the grid.
@@ -78,10 +76,7 @@ public class Login {
 			
 			//this will try to log in the user
 			//if the entry is correct then the user will be taken to the dashboard
-			
             User user = userManager.loginUser(username, password);
-			
-//			User user = UserManager.loginUser(username, password); // was the orginal before change!!!!!!!!!!!!!!!!
 			if (user != null) {
 				app.showDashboard(user);
 				

@@ -1,6 +1,5 @@
 package View;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import util.Alerts;
@@ -22,7 +21,7 @@ public class Registration {
     }
 	
 	//Here ive created the registration page layout
-    //allows for users to enter all crical info, name, username and password.
+    //allows for users to enter all critical info, name, username and password.
 	public GridPane createRegistration() {
 		//I here set the alignment of the grid.
 		//i set the vertical and horizontal gaps
@@ -86,28 +85,43 @@ public class Registration {
 			String lastName = lastNameField.getText();
 			
 			//here the program checks if anything is empty, all fields need to be filled out to register
-			 if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
-				 Alerts.errorMessage("Registration Error", "All fields must be filled out.");
-			        return;
-			    }
-			 //Here the program gets the instance of user manager
-			 UserManager userManager = UserManager.getInstance();
+			if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+				Alerts.errorMessage("Registration Error", "All fields must be filled out.");
+		        return;
+		    }
+			//just something i thought of, dont want the user making an account that is only spaces
+			//not sure it needed but made sense, because people can have spaces in their names as well as numbers
+			//(elon musks kid) but they cant have just a space? 
+			if (username.trim().isEmpty()) {
+				Alerts.errorMessage("Registration Error", "Username cannot be only spaces.");
+				return;
+				}
+			if (firstName.trim().isEmpty()) {
+				Alerts.errorMessage("Registration Error", "First name cannot be only spaces.");
+				return;
+				}
+			if (lastName.trim().isEmpty()) {
+				Alerts.errorMessage("Registration Error", "Last name cannot be only spaces.");
+				return;
+				}
+			//Here the program gets the instance of user manager
+			UserManager userManager = UserManager.getInstance();
 			 
-			 //boolean is used to register the user, checks if it is unique
-			 boolean registered = userManager.registerUser(username, password, firstName, lastName);
-		
+			//boolean is used to register the user, checks if it is unique
+			boolean registered = userManager.registerUser(username, password, firstName, lastName);
+			
 			//if the registration is ok then it will direct the user to the login area
-			 if(registered ) {
-				 Alerts.infoMessage("registration Successful", "Account successfully registered");
-				 app.showLogin();
+			if(registered ) {
+				Alerts.infoMessage("registration Successful", "Account successfully registered");
+				app.showLogin();
 			
 			//if its not unique it will say the attempt was unsucessful.
-			 }else {
-				 Alerts.errorMessage("Registration error", "Username already exists");
-				 }
+			}else {
+				Alerts.errorMessage("Registration error", "Username already exists");
+				}
 			});
 			pane.add(btnRegiester, 1, 5);
-		
-		return pane;
+			
+			return pane;
 	}
 }

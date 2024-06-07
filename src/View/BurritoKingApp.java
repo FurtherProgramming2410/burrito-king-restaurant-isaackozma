@@ -1,14 +1,9 @@
 package View;
 import Controller.UserManager;
 import Model.User;
-import View.OrderOnDashBoard;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.scene.layout.GridPane;
-import javafx.stage.WindowEvent;
 
 
 //starting point of the program
@@ -102,9 +97,6 @@ public class BurritoKingApp extends Application{
 		Scene scene = new Scene(orderOnDashBoard.createOrderPlacement(user), 800, 800);
 		startingStage.setScene(scene);
 	}
-	
-
-
 	
 	//Main method launches the program
 	public static void main(String[] args) {
