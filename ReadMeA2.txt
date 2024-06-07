@@ -2,9 +2,39 @@ Burrito King GUI Application
 
 GitHub repository link - https://github.com/FurtherProgramming2410/burrito-king-restaurant-isaackozma.git
 
-Burrito King GUI application is a program that allows users to log in, register, place orders, pay for orders, collect/cancel orders, export order information manage their profile and much more. 
-
 Program class design
+
+Model: This package contains the core business logic and data.
+•	User: Represents a user, storing personal details, orders, and VIP status.
+•	Order: Represents an order, including items, status, and timestamps.
+•	FoodItem and Meal: Represent menu items with pricing and quantity details.
+
+View: This package handles the user interface and interaction.
+•	BurritoKingApp: The main class that initializes the application and manages screen transitions.
+•	Dashboard: The primary interface after login, allowing users to place orders, view orders, and manage their profile.
+•	Login, Registration, and OrderOnDashBoard: Handle specific UI screens for user login, registration, and ordering.
+Controller: This package manages the flow of data between the Model and View layers. Key classes include:
+•	UserManager: Manages user data, authentication, order processing, and data persistence.
+•	PaymentInfo: Validates payment details for order processing.
+MVC Interaction:
+•	Model: Classes such as User and Order handle data storage and business logic.
+•	View: Classes like Dashboard and Login provide interfaces for user interaction.
+•	Controller: UserManager processes inputs from the View, updates the Model, and ensures data integrity. For example, when a user places an order (View), UserManager validates payment details (Controller) and updates the order status (Model).
+
+Design pattern implemented 
+The design patter that I implemented was a singleton pattern. UserManager is the class that implements the Singleton pattern. It ensures that there is only one instance of UserManager within the program. It is implemented to manage user data and orders across the program. 
+
+Junit tests implemented 
+The Junit test I implemented were to ensure the correctness of key functions. 
+
+testAddItem()  - Tests adding items to an order
+testCalculateTotal() – Tests the calculation of the total cost of the order.
+testSetStatus() – Test the setting of the status of the order.
+testSetOrderPlacedTime() – Test the setting of the order placed time
+testToString() – test the string representation of the order. 
+
+
+Extra info I orginally wrote about the classes before my last day edit. 
 The Burrito King GUI has fifteen classes within 4 packages. Each class serves as a valuable assest to make the program run correctly. Below I will list the classes and their purpose.
 
 BurritoKingApp – This class serves as the “Main” class as it manages the flow between different screens. 
@@ -83,14 +113,4 @@ useCredits(int credits) – Uses the amount of credits wanted by the user.
 
 
  
-Design pattern implemented 
-The design patter that I implemented was a singleton pattern. UserManager is the class that implements the Singleton pattern. It ensures that there is only one instance of UserManager within the program. It is implemented to manage user data and orders across the program. 
 
-Junit tests implemented 
-The Junit test I implemented were to ensure the correctness of key functions. 
-
-testAddItem()  - Tests adding items to an order
-testCalculateTotal() – Tests the calculation of the total cost of the order.
-testSetStatus() – Test the setting of the status of the order.
-testSetOrderPlacedTime() – Test the setting of the order placed time
-testToString() – test the string representation of the order. 
